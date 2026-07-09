@@ -335,11 +335,19 @@ def forgot_password():
 
 @auth_bp.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
+    query_email = request.args.get('email', '').strip()
+    query_code = request.args.get('code', '').strip()
+
+    if query_email and query_code:
+        session['reset_email'] = query_email
+
     # Retrieve email from session
     email = session.get('reset_email')
     if not email:
         flash('Session expired or access denied. Please initiate password recovery again.', 'danger')
         return redirect(url_for('auth.forgot_password'))
+
+    code_val = query_code or request.form.get('otp_code', '').strip()
 
     if request.method == 'POST':
         otp_code = request.form.get('otp_code', '').strip()
@@ -348,11 +356,11 @@ def reset_password():
 
         if not (otp_code and password and confirm_password):
             flash('Please fill in all fields.', 'danger')
-            return render_template('auth/reset_password.html')
+            return render_template('auth/reset_password.html', code=code_val)
 
         if password != confirm_password:
             flash('Passwords do not match.', 'danger')
-            return render_template('auth/reset_password.html')
+            return render_template('auth/reset_password.html', code=code_val)
 
         # Verify OTP
         if verify_otp(email, otp_code):
@@ -385,15 +393,15 @@ def reset_password():
                 except Exception as e:
                     db.session.rollback()
                     flash(f"An error occurred while updating the password: {e}", 'danger')
-                    return render_template('auth/reset_password.html')
+                    return render_template('auth/reset_password.html', code=code_val)
             else:
                 flash('User account not found.', 'danger')
                 return redirect(url_for('auth.forgot_password'))
         else:
             flash('Invalid or expired OTP. Please try again.', 'danger')
-            return render_template('auth/reset_password.html')
+            return render_template('auth/reset_password.html', code=code_val)
 
-    return render_template('auth/reset_password.html')
+    return render_template('auth/reset_password.html', code=code_val)
 
 @auth_bp.route('/logout')
 @login_required

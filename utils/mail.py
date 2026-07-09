@@ -24,13 +24,21 @@ EduExam Support Team
 """
     elif purpose == "reset":
         subject = "Reset Your Password - Online Examination System"
+        try:
+            from flask import request, url_for
+            reset_link = f"{request.host_url.rstrip('/')}{url_for('auth.reset_password', email=recipient_email, code=otp)}"
+        except Exception:
+            reset_link = f"http://localhost:5000/reset-password?email={recipient_email}&code={otp}"
         body = f"""Hello,
 
 We received a request to reset your password for the Online Examination System.
 
-Your password reset OTP is: {otp}
+You can reset your password immediately by clicking the link below:
+{reset_link}
 
-This code is valid for 5 minutes. If you did not make this request, please ignore this email.
+Or you can enter the following 6-digit OTP code manually: {otp}
+
+This code and link are valid for 5 minutes. If you did not make this request, please ignore this email.
 
 Best regards,
 EduExam Support Team
