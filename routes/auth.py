@@ -350,6 +350,7 @@ def forgot_password():
                 return render_template('auth/forgot_password.html')
         else:
             # Prevent user enumeration by displaying a generic success message
+            session['reset_email'] = email
             flash('If the email is registered in our system, a password reset OTP was sent.', 'success')
             return redirect(url_for('auth.reset_password'))
 
