@@ -373,3 +373,113 @@ h1, h2, h3, h4, h5, h6 {
         padding: 0;
     }
 }
+
+/* ==========================================================================
+   Premium Landing Page Redesign Styles
+   ========================================================================== */
+
+/* Gradient text effect */
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* Floating animation for hero image */
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(0.5deg); }
+}
+
+.hero-image-wrapper {
+    animation: float 6s ease-in-out infinite;
+    position: relative;
+}
+
+.hero-image-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    z-index: -1;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #8b5cf6 100%);
+    filter: blur(25px);
+    opacity: 0.15;
+    border-radius: 24px;
+}
+
+/* Glassmorphism Credentials Card */
+.glass-credential-card {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+    transition: all 0.3s ease;
+}
+
+[data-bs-theme="dark"] .glass-credential-card {
+    background: rgba(19, 26, 38, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.glass-credential-card:hover {
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08);
+}
+
+/* Premium Navbar Links */
+.nav-link-premium {
+    position: relative;
+    padding: 6px 0;
+    transition: color 0.3s ease;
+}
+
+.nav-link-premium::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--primary-color);
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+.nav-link-premium:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+/* Glow highlights for hero buttons */
+.btn-glow-primary {
+    position: relative;
+    box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-glow-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px 0 rgba(37, 99, 235, 0.45);
+}
+
+.btn-outline-glow {
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-glow:hover {
+    border-color: var(--primary-color);
+    background-color: var(--primary-light);
+    color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+/* Dark mode adjust for credential blocks */
+[data-bs-theme="dark"] .dark-bg-adjust {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+}

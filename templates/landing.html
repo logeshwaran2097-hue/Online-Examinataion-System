@@ -10,10 +10,10 @@
             <span class="fs-4 fw-bold text-primary"><i class="fa-solid fa-graduation-cap me-2"></i>EduExam</span>
         </a>
         <nav class="d-none d-md-flex align-items-center gap-4">
-            <a href="#features" class="text-decoration-none text-reset fw-medium">Features</a>
-            <a href="#stats" class="text-decoration-none text-reset fw-medium">Statistics</a>
-            <a href="#about" class="text-decoration-none text-reset fw-medium">About</a>
-            <a href="https://github.com/logeshwaran2097-hue/Online-Examinataion-System" target="_blank" class="text-decoration-none text-reset fw-medium">
+            <a href="#features" class="nav-link-premium text-decoration-none text-reset fw-medium">Features</a>
+            <a href="#stats" class="nav-link-premium text-decoration-none text-reset fw-medium">Statistics</a>
+            <a href="#about" class="nav-link-premium text-decoration-none text-reset fw-medium">About</a>
+            <a href="https://github.com/logeshwaran2097-hue/Online-Examinataion-System" target="_blank" class="nav-link-premium text-decoration-none text-reset fw-medium">
                 <i class="fa-brands fa-github me-1"></i>GitHub
             </a>
         </nav>
@@ -49,26 +49,26 @@
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
                     <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold mb-3">Professional Assessment Tool</span>
-                    <h1 class="display-4 fw-extrabold mb-4" style="line-height: 1.2;">
-                        The Smart Way to Evaluate and Excel
+                    <h1 class="display-4 fw-extrabold mb-4" style="line-height: 1.2; font-family: 'Outfit', sans-serif;">
+                        The Smart Way to <span class="text-gradient">Evaluate</span> and <span class="text-gradient">Excel</span>
                     </h1>
                     <p class="lead text-muted mb-4">
                         A robust, responsive, and highly secure examination system offering automated grading, instant results, analytics, and cheat-resistant tools.
                     </p>
                     <div class="d-flex gap-3 flex-wrap">
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-5 rounded-pill shadow">Get Started Now</a>
-                        <a href="{{ url_for('admin.login') }}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill"><i class="fa-solid fa-user-shield me-2"></i>Admin Login</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-5 rounded-pill btn-glow-primary">Get Started Now</a>
+                        <a href="{{ url_for('admin.login') }}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill btn-outline-glow"><i class="fa-solid fa-user-shield me-2"></i>Admin Login</a>
                     </div>
 
                     <!-- Demo Credentials Card -->
-                    <div class="mt-4 p-4 rounded-4 border border-primary-subtle bg-primary-subtle" style="max-width: 480px;">
+                    <div class="mt-5 p-4 glass-credential-card border border-primary-subtle" style="max-width: 480px;">
                         <h3 class="h6 fw-bold mb-3 text-primary">
                             <i class="fa-solid fa-key me-2"></i>Demo Login Credentials
                         </h3>
                         <div class="row g-3">
                             <!-- Admin Login -->
                             <div class="col-sm-6">
-                                <div class="bg-white rounded-3 p-3 border border-primary-subtle h-100">
+                                <div class="bg-white rounded-3 p-3 border border-primary-subtle h-100 dark-bg-adjust">
                                     <div class="d-flex align-items-center gap-2 mb-2">
                                         <span class="badge bg-danger px-2 py-1 rounded-pill">
                                             <i class="fa-solid fa-user-shield me-1"></i>Admin
@@ -89,7 +89,7 @@
                             </div>
                             <!-- Student Login -->
                             <div class="col-sm-6">
-                                <div class="bg-white rounded-3 p-3 border border-success-subtle h-100">
+                                <div class="bg-white rounded-3 p-3 border border-success-subtle h-100 dark-bg-adjust">
                                     <div class="d-flex align-items-center gap-2 mb-2">
                                         <span class="badge bg-success px-2 py-1 rounded-pill">
                                             <i class="fa-solid fa-user-graduate me-1"></i>Student
@@ -112,7 +112,9 @@
 
                 </div>
                 <div class="col-lg-6 text-center">
-                    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80" alt="Assessment Illustration" class="img-fluid rounded-4 shadow-lg border border-3 border-white">
+                    <div class="hero-image-wrapper">
+                        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80" alt="Assessment Illustration" class="img-fluid rounded-4 shadow-lg border border-3 border-white">
+                    </div>
                 </div>
             </div>
         </div>
