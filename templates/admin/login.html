@@ -44,7 +44,7 @@
                 <label for="password" class="form-label small fw-medium text-white-50">Console Password</label>
                 <div class="input-group">
                     <span class="input-group-text border-end-0 text-white-50" style="background-color: #0f172a; border-color: #475569;"><i class="fa-solid fa-key"></i></span>
-                    <input type="password" class="form-control border-start-0 ps-0 border-end-0 text-white" id="password" name="password" placeholder="••••••••" required style="background-color: #0f172a; border-color: #475569;">
+                    <input type="password" class="form-control border-start-0 ps-0 border-end-0 text-white" id="password" name="password" placeholder="adminpassword" required style="background-color: #0f172a; border-color: #475569;">
                     <button class="btn border-start-0 bg-transparent border-end border-top border-bottom text-white-50 password-toggle" type="button" data-target="password" style="border-color: #475569;">
                         <i class="fa-solid fa-eye"></i>
                     </button>
@@ -54,6 +54,13 @@
 
             <!-- Submit -->
             <button type="submit" class="btn btn-info w-100 py-2.5 rounded-3 fw-semibold text-dark">Authenticate</button>
+
+            <!-- Quick Auto-Fill Demo Admin -->
+            <div class="mt-3 text-center">
+                <button type="button" class="btn btn-outline-info btn-sm w-100 rounded-pill py-2 text-white-50 border-dashed" id="quick-fill-admin" style="border-style: dashed !important; border-color: rgba(255,255,255,0.2) !important;">
+                    <i class="fa-solid fa-magic me-1"></i> Auto-fill Demo Admin Keys
+                </button>
+            </div>
         </form>
 
         <div class="text-center mt-4">
@@ -61,4 +68,20 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const fillBtn = document.getElementById('quick-fill-admin');
+        if (fillBtn) {
+            fillBtn.addEventListener('click', function() {
+                const usernameInput = document.getElementById('username');
+                const passwordInput = document.getElementById('password');
+                if (usernameInput && passwordInput) {
+                    usernameInput.value = 'admin';
+                    passwordInput.value = 'adminpassword';
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

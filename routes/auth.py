@@ -29,6 +29,27 @@ def log_activity(user_id, role, activity):
         # Fallback logging to stdout/stderr in case database write fails
         print(f"Error writing to activity_logs: {e}", file=sys.stderr)
 
+def seed_default_student():
+    """
+    Ensures at least one verified student account exists in the database.
+    """
+    try:
+        if not User.query.filter_by(email='student@eduexam.com').first():
+            hashed_pw = bcrypt.generate_password_hash('studentpassword').decode('utf-8')
+            default_student = User(
+                full_name='Demo Student',
+                email='student@eduexam.com',
+                password=hashed_pw,
+                is_verified=True,
+                status=True
+            )
+            db.session.add(default_student)
+            db.session.commit()
+            print("INFO: Seeded default student account (student@eduexam.com / studentpassword)")
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error seeding default student: {e}")
+
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -223,6 +244,7 @@ def resend_otp():
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    seed_default_student()
     if current_user.is_authenticated:
         return redirect(url_for('dashboard.student_dashboard'))
 
