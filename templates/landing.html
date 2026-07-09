@@ -28,7 +28,7 @@
 </header>
 
 <!-- Main Container -->
-<main class="animate-fade-in">
+<main class="animate-fade-in premium-landing-bg">
     <!-- Flash Messages -->
     <div class="container mt-3">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -48,7 +48,7 @@
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
-                    <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold mb-3">Professional Assessment Tool</span>
+                    <span class="premium-badge mb-3"><i class="fa-solid fa-circle-check"></i> Professional Assessment Tool</span>
                     <h1 class="display-4 fw-extrabold mb-4" style="line-height: 1.2; font-family: 'Outfit', sans-serif;">
                         The Smart Way to <span class="text-gradient">Evaluate</span> and <span class="text-gradient">Excel</span>
                     </h1>
@@ -112,8 +112,10 @@
 
                 </div>
                 <div class="col-lg-6 text-center">
-                    <div class="hero-image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80" alt="Assessment Illustration" class="img-fluid rounded-4 shadow-lg border border-3 border-white">
+                    <div class="illustration-frame">
+                        <div class="hero-image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80" alt="Assessment Illustration" class="img-fluid rounded-4 shadow-lg border border-3 border-white">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -129,22 +131,22 @@
             </div>
             <div class="row g-4">
                 <div class="col-md-4">
-                    <div class="card card-premium h-100 p-4">
-                        <div class="text-primary fs-1 mb-3"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="card-premium-feature h-100">
+                        <div class="icon-wrapper-premium icon-blue"><i class="fa-solid fa-shield-halved"></i></div>
                         <h3 class="h4 mb-2">Secure Testing</h3>
                         <p class="text-muted mb-0">Cheat-resistant features including locked browsers and session surveillance to ensure academic integrity.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card card-premium h-100 p-4">
-                        <div class="text-success fs-1 mb-3"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="card-premium-feature h-100">
+                        <div class="icon-wrapper-premium icon-green"><i class="fa-solid fa-bolt"></i></div>
                         <h3 class="h4 mb-2">Instant Results</h3>
                         <p class="text-muted mb-0">Automated grading engine processes results instantly upon submission and triggers digital scoring graphs.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card card-premium h-100 p-4">
-                        <div class="text-warning fs-1 mb-3"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="card-premium-feature h-100">
+                        <div class="icon-wrapper-premium icon-yellow"><i class="fa-solid fa-file-pdf"></i></div>
                         <h3 class="h4 mb-2">PDF Report Exports</h3>
                         <p class="text-muted mb-0">Students and administrators can immediately download professional, formatted PDF assessment sheets.</p>
                     </div>
@@ -158,19 +160,19 @@
         <div class="container">
             <div class="row g-4 text-center">
                 <div class="col-md-3 col-6">
-                    <h3 class="display-5 fw-bold text-primary mb-1">10k+</h3>
+                    <h3 class="stats-number mb-1">10k+</h3>
                     <p class="text-muted mb-0">Active Students</p>
                 </div>
                 <div class="col-md-3 col-6">
-                    <h3 class="display-5 fw-bold text-success mb-1">500+</h3>
+                    <h3 class="stats-number mb-1">500+</h3>
                     <p class="text-muted mb-0">Exams Hosted</p>
                 </div>
                 <div class="col-md-3 col-6">
-                    <h3 class="display-5 fw-bold text-warning mb-1">99.9%</h3>
+                    <h3 class="stats-number mb-1">99.9%</h3>
                     <p class="text-muted mb-0">System Uptime</p>
                 </div>
                 <div class="col-md-3 col-6">
-                    <h3 class="display-5 fw-bold text-info mb-1">Instant</h3>
+                    <h3 class="stats-number mb-1">Instant</h3>
                     <p class="text-muted mb-0">PDF Generation</p>
                 </div>
             </div>
@@ -182,7 +184,9 @@
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
-                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" alt="About System" class="img-fluid rounded-4 shadow">
+                    <div class="illustration-frame">
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" alt="About System" class="img-fluid rounded-4 shadow">
+                    </div>
                 </div>
                 <div class="col-lg-6">
                     <h2 class="h1 mb-4">Empowering Modern Classrooms</h2>
