@@ -26,7 +26,7 @@ A secure, scalable, and interactive Online Examination System built using **Pyth
 
 ### 1. Clone & Setup Virtual Environment
 ```bash
-git clone <repository-url>
+git clone https://github.com/logeshwaran2097-hue/Online-Examinataion-System.git
 cd Online-Examination-System
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
