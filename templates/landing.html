@@ -59,56 +59,9 @@
                         <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-5 rounded-pill btn-glow-primary">Get Started Now</a>
                         <a href="{{ url_for('admin.login') }}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill btn-outline-glow"><i class="fa-solid fa-user-shield me-2"></i>Admin Login</a>
                     </div>
-
-                    <!-- Demo Credentials Card -->
-                    <div class="mt-5 p-4 glass-credential-card border border-primary-subtle" style="max-width: 480px;">
-                        <h3 class="h6 fw-bold mb-3 text-primary">
-                            <i class="fa-solid fa-key me-2"></i>Demo Login Credentials
-                        </h3>
-                        <div class="row g-3">
-                            <!-- Admin Login -->
-                            <div class="col-sm-6">
-                                <div class="bg-white rounded-3 p-3 border border-primary-subtle h-100 dark-bg-adjust">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <span class="badge bg-danger px-2 py-1 rounded-pill">
-                                            <i class="fa-solid fa-user-shield me-1"></i>Admin
-                                        </span>
-                                    </div>
-                                    <div class="small mb-1">
-                                        <span class="text-muted">Username:</span>
-                                        <code class="ms-1 text-danger fw-bold">admin</code>
-                                    </div>
-                                    <div class="small mb-2">
-                                        <span class="text-muted">Password:</span>
-                                        <code class="ms-1 text-danger fw-bold">adminpassword</code>
-                                    </div>
-                                    <a href="{{ url_for('admin.login') }}" class="btn btn-danger btn-sm rounded-pill px-3 w-100">
-                                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i>Admin Login
-                                    </a>
-                                </div>
-                            </div>
-                            <!-- Student Login -->
-                            <div class="col-sm-6">
-                                <div class="bg-white rounded-3 p-3 border border-success-subtle h-100 dark-bg-adjust">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <span class="badge bg-success px-2 py-1 rounded-pill">
-                                            <i class="fa-solid fa-user-graduate me-1"></i>Student
-                                        </span>
-                                    </div>
-                                    <div class="small mb-1 text-muted">Register your own account</div>
-                                    <div class="small mb-2 text-muted">or use your registered email & password.</div>
-                                    <a href="{{ url_for('auth.login') }}" class="btn btn-success btn-sm rounded-pill px-3 w-100">
-                                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i>Student Login
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-muted small mt-2 mb-0">
-                            <i class="fa-solid fa-circle-info me-1"></i>
-                            Admin account is auto-seeded when the app first starts.
-                        </p>
-                    </div>
-                    <!-- End Demo Credentials Card -->
+                    <p class="text-muted small mt-4">
+                        <i class="fa-solid fa-circle-info me-1"></i> Admin accounts are initialized on deployment. Toggle the bottom-right corner menu for test login keys.
+                    </p>
 
                 </div>
                 <div class="col-lg-6 text-center">
@@ -180,23 +133,80 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="py-5 bg-light-subtle border-top border-light-subtle">
-        <div class="container">
+    <section id="about" class="py-6 bg-light-subtle border-top border-bottom border-light-subtle">
+        <div class="container d-flex flex-column gap-6">
+            <!-- Row 1: Admin Showcase -->
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6 order-lg-2">
+                    <div class="illustration-frame">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" alt="Admin Dashboard Showcase" class="img-fluid rounded-4 shadow-lg border border-3 border-white">
+                    </div>
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <span class="premium-badge mb-3"><i class="fa-solid fa-gears"></i> Central Administration</span>
+                    <h2 class="h1 mb-4" style="font-family: 'Outfit', sans-serif;">Empowering Educators & Institutions</h2>
+                    <p class="text-muted mb-4">
+                        EduExam gives instructors complete command over their curriculum and grading lifecycles. Automate your administration workflow with specialized utility suites:
+                    </p>
+                    <ul class="list-unstyled d-flex flex-column gap-3 mb-4">
+                        <li class="d-flex align-items-start gap-3">
+                            <span class="text-primary fs-5 mt-1"><i class="fa-solid fa-circle-check"></i></span>
+                            <div>
+                                <strong>Dynamic Question Banks:</strong> Build modular lists categorized by subjects, weightage, and difficulty.
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-start gap-3">
+                            <span class="text-primary fs-5 mt-1"><i class="fa-solid fa-circle-check"></i></span>
+                            <div>
+                                <strong>Real-time Stats:</strong> Get class performance distribution graphs and score trends automatically.
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-start gap-3">
+                            <span class="text-primary fs-5 mt-1"><i class="fa-solid fa-circle-check"></i></span>
+                            <div>
+                                <strong>One-Click PDF Exports:</strong> Download beautifully formatted student performance certificates and result sheets.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr class="my-5 opacity-10">
+
+            <!-- Row 2: Student & Proctoring Showcase -->
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
                     <div class="illustration-frame">
-                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" alt="About System" class="img-fluid rounded-4 shadow">
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" alt="Student Assessment Room Showcase" class="img-fluid rounded-4 shadow-lg border border-3 border-white">
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <h2 class="h1 mb-4">Empowering Modern Classrooms</h2>
-                    <p class="text-muted mb-3">
-                        EduExam is built to solve testing bottlenecks in digital learning. We provide educators with easy tools to construct question banks, monitor student outcomes, and auto-generate report sheets.
-                    </p>
+                    <span class="premium-badge mb-3"><i class="fa-solid fa-user-graduate"></i> Student Experience</span>
+                    <h2 class="h1 mb-4" style="font-family: 'Outfit', sans-serif;">Fostering Academic Integrity & Accessibility</h2>
                     <p class="text-muted mb-4">
-                        For students, our system provides clean, low-latency, and accessible examination rooms compatible with standard desktops, tablets, and smartphones.
+                        Provide a clean, focused, and secure test-taking space for candidates on any computing device. Enable student trust and high accountability with:
                     </p>
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary rounded-pill px-4">Register as a Student</a>
+                    <ul class="list-unstyled d-flex flex-column gap-3 mb-4">
+                        <li class="d-flex align-items-start gap-3">
+                            <span class="text-success fs-5 mt-1"><i class="fa-solid fa-shield-halved"></i></span>
+                            <div>
+                                <strong>Smart Web Proctoring:</strong> Automatically monitor page visibility, tab switches, and log warnings instantly.
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-start gap-3">
+                            <span class="text-success fs-5 mt-1"><i class="fa-solid fa-shield-halved"></i></span>
+                            <div>
+                                <strong>Secure Webcam Monitoring:</strong> Access visual proctor logs to verify identity throughout assessments.
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-start gap-3">
+                            <span class="text-success fs-5 mt-1"><i class="fa-solid fa-shield-halved"></i></span>
+                            <div>
+                                <strong>Responsive Mobile Design:</strong> Take exams fluidly with full touchscreen adaptations on phones or tablets.
+                            </div>
+                        </li>
+                    </ul>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary rounded-pill px-4 btn-glow-primary">Create Your Student Account</a>
                 </div>
             </div>
         </div>
@@ -219,4 +229,57 @@
         </div>
     </div>
 </footer>
+
+<!-- Floating Demo Credentials Widget -->
+<div class="floating-credentials-widget">
+    <div class="credentials-panel">
+        <h4><i class="fa-solid fa-key me-2"></i>Demo Login Keys</h4>
+        <div class="d-flex flex-column gap-3">
+            <!-- Admin Card -->
+            <div class="p-2 border border-primary-subtle rounded-3 bg-light-subtle dark-bg-adjust">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="badge bg-danger">Admin</span>
+                    <a href="{{ url_for('admin.login') }}" class="text-decoration-none text-danger small fw-bold">Login <i class="fa-solid fa-arrow-right-to-bracket ms-1"></i></a>
+                </div>
+                <div class="small"><span class="text-muted">User:</span> <code class="text-danger fw-semibold">admin</code></div>
+                <div class="small"><span class="text-muted">Pass:</span> <code class="text-danger fw-semibold">adminpassword</code></div>
+            </div>
+            <!-- Student Card -->
+            <div class="p-2 border border-success-subtle rounded-3 bg-light-subtle dark-bg-adjust">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="badge bg-success">Student</span>
+                    <a href="{{ url_for('auth.login') }}" class="text-decoration-none text-success small fw-bold">Login <i class="fa-solid fa-arrow-right-to-bracket ms-1"></i></a>
+                </div>
+                <div class="small text-muted mb-1">Use your registered email & password.</div>
+            </div>
+        </div>
+        <p class="text-muted small mt-2 mb-0" style="font-size: 0.75rem;">
+            <i class="fa-solid fa-info-circle me-1"></i> Admin auto-seeded on launch.
+        </p>
+    </div>
+    <button class="credentials-toggle-btn">
+        <i class="fa-solid fa-key"></i> Demo Logins
+    </button>
+</div>
+
+<!-- Script to toggle floating widget -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const toggleBtn = document.querySelector('.credentials-toggle-btn');
+        const widget = document.querySelector('.floating-credentials-widget');
+        
+        if (toggleBtn && widget) {
+            toggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                widget.classList.toggle('active');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!widget.contains(e.target)) {
+                    widget.classList.remove('active');
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
