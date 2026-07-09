@@ -1,0 +1,203 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Result Details - EduExam{% endblock %}
+
+{% block extra_css %}
+<style>
+    .review-card {
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        border: 2px solid var(--border-color);
+    }
+    .review-card.correct {
+        border-color: #10b981; /* Green */
+        background-color: rgba(16, 185, 129, 0.02);
+    }
+    .review-card.wrong {
+        border-color: #ef4444; /* Red */
+        background-color: rgba(239, 68, 68, 0.02);
+    }
+    .review-card.skipped {
+        border-color: #94a3b8; /* Slate */
+        background-color: rgba(148, 163, 184, 0.02);
+    }
+    .badge-status {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Main Card Header -->
+        <div class="card card-premium p-4 mb-4">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 border-bottom pb-3 mb-3">
+                <div>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill mb-2 px-3 py-1.5 fw-semibold">{{ result.exam.subject_name }}</span>
+                    <h2 class="fw-bold mb-1">{{ result.exam.exam_title }}</h2>
+                    <p class="text-muted small mb-0">Examination Scorecard & Detailed Analysis</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('result.download_pdf_report', result_id=result.id) }}" class="btn btn-outline-secondary rounded-pill px-4 btn-sm">
+                        <i class="fa-solid fa-file-pdf me-2"></i>Download PDF Report
+                    </a>
+                </div>
+            </div>
+
+            <!-- Meta details Grid -->
+            <div class="row g-3 small text-muted">
+                <div class="col-sm-6 col-md-3">
+                    <div class="fw-bold">Student Name</div>
+                    <div>{{ current_user.full_name }}</div>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                    <div class="fw-bold">Department / Year</div>
+                    <div>{{ current_user.department or 'N/A' }} / Year {{ current_user.year_of_study }}</div>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                    <div class="fw-bold">Exam Date</div>
+                    <div>{{ result.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                    <div class="fw-bold">Duration</div>
+                    <div>{{ result.exam.duration_minutes }} Minutes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Score Metrics row -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3 text-center">
+                <div class="card card-premium p-3 h-100 justify-content-center">
+                    <div class="text-muted small mb-1">Marks Obtained</div>
+                    <h3 class="fw-bold mb-0 text-primary">{{ result.obtained_marks }} / {{ result.total_marks }}</h3>
+                </div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="card card-premium p-3 h-100 justify-content-center">
+                    <div class="text-muted small mb-1">Percentage</div>
+                    <h3 class="fw-bold mb-0 text-success">{{ result.percentage }}%</h3>
+                </div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="card card-premium p-3 h-100 justify-content-center">
+                    <div class="text-muted small mb-1">Letter Grade</div>
+                    <h3 class="fw-bold mb-0 text-warning">{{ result.grade }}</h3>
+                </div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="card card-premium p-3 h-100 justify-content-center">
+                    <div class="text-muted small mb-1">Leaderboard Rank</div>
+                    <h3 class="fw-bold mb-0 text-info">#{{ calc.rank }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Breakdown stats -->
+        <div class="card card-premium p-4 mb-4">
+            <h3 class="h6 fw-bold text-uppercase text-muted mb-3" style="letter-spacing: 0.5px;">Attempt Analytics</h3>
+            <div class="row text-center g-3">
+                <div class="col-sm-3 border-end border-light-subtle">
+                    <h5 class="fw-bold text-primary mb-1">{{ calc.total_questions }}</h5>
+                    <span class="text-muted small">Total Questions</span>
+                </div>
+                <div class="col-sm-3 border-end border-light-subtle">
+                    <h5 class="fw-bold text-success mb-1">{{ calc.correct_answers }}</h5>
+                    <span class="text-muted small">Correct Answers</span>
+                </div>
+                <div class="col-sm-3 border-end border-light-subtle">
+                    <h5 class="fw-bold text-danger mb-1">{{ calc.wrong_answers }}</h5>
+                    <span class="text-muted small">Wrong Answers</span>
+                </div>
+                <div class="col-sm-3">
+                    <h5 class="fw-bold text-muted mb-1">{{ calc.skipped_questions }}</h5>
+                    <span class="text-muted small">Skipped</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Review Cards -->
+        <h3 class="h5 fw-bold mb-3"><i class="fa-solid fa-list-check text-secondary me-2"></i>Question-by-Question Review</h3>
+        <div class="d-flex flex-column gap-3 mb-4">
+            {% for q in questions %}
+                {% set ans = answers_map.get(q.id) %}
+                {% set sel = ans.selected_answer if ans else None %}
+                
+                {% set card_class = 'skipped' %}
+                {% set status_text = 'Skipped' %}
+                {% set status_badge = 'bg-secondary text-white' %}
+                
+                {% if sel %}
+                    {% if sel == q.correct_answer %}
+                        {% set card_class = 'correct' %}
+                        {% set status_text = 'Correct' %}
+                        {% set status_badge = 'bg-success text-white' %}
+                    {% else %}
+                        {% set card_class = 'wrong' %}
+                        {% set status_text = 'Incorrect' %}
+                        {% set status_badge = 'bg-danger text-white' %}
+                    {% endif %}
+                {% endif %}
+
+                <div class="review-card p-4 {{ card_class }}">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="fw-bold text-body small">Question {{ loop.index }}</span>
+                        <div class="d-flex gap-2 align-items-center">
+                            <span class="badge-status {{ status_badge }}">{{ status_text }}</span>
+                            <span class="badge bg-secondary-subtle text-secondary rounded-pill small px-2">{% if sel and sel == q.correct_answer %}{{ q.marks }}{% else %}0{% endif %} / {{ q.marks }} Marks</span>
+                        </div>
+                    </div>
+                    
+                    <h4 class="h6 fw-bold mb-3 text-body">{{ q.question_text }}</h4>
+                    
+                    <!-- Options table lists -->
+                    <div class="d-flex flex-column gap-2 small mb-3">
+                        {% if q.options %}
+                            {% set opt = q.options %}
+                            {% for letter, text in [('A', opt.option_a), ('B', opt.option_b), ('C', opt.option_c), ('D', opt.option_d)] %}
+                                {% if text %}
+                                    <div class="p-2 border rounded-3 d-flex align-items-center justify-content-between 
+                                        {% if letter == q.correct_answer %}
+                                            border-success bg-success bg-opacity-10 fw-bold text-success
+                                        {% elif letter == sel %}
+                                            border-danger bg-danger bg-opacity-10 fw-bold text-danger
+                                        {% else %}
+                                            bg-light-subtle text-muted
+                                        {% endif %}">
+                                        <div>
+                                            <span class="me-2">({{ letter }})</span>
+                                            <span>{{ text }}</span>
+                                        </div>
+                                        <div>
+                                            {% if letter == q.correct_answer %}
+                                                <i class="fa-solid fa-circle-check text-success"></i> Correct Answer
+                                            {% elif letter == sel %}
+                                                <i class="fa-solid fa-circle-xmark text-danger"></i> Selected
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Explanations block -->
+                    <div class="bg-light-subtle rounded-3 p-3 border text-muted small">
+                        <div class="fw-bold mb-1"><i class="fa-solid fa-circle-info me-1"></i>Explanation:</div>
+                        <div>{{ q.explanation or 'No explanation details logged for this question key.' }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Go back -->
+        <div class="d-grid col-sm-6 mx-auto mb-4">
+            <a href="{{ url_for('result.results_list') }}" class="btn btn-primary rounded-pill"><i class="fa-solid fa-arrow-left me-2"></i>Back to Transcripts</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Exam Instructions - EduExam{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-8">
+        <div class="card card-premium p-4">
+            <!-- Header -->
+            <div class="text-center border-bottom pb-4 mb-4">
+                <span class="badge bg-primary-subtle text-primary rounded-pill mb-2 px-3 py-1.5 fw-semibold">{{ exam.subject_name }}</span>
+                <h2 class="fw-bold mb-1">{{ exam.exam_title }}</h2>
+                <p class="text-muted mb-0">Please read the instructions carefully before launching the test.</p>
+            </div>
+
+            <!-- Parameters Grid -->
+            <div class="row g-4 mb-4">
+                <div class="col-sm-4 text-center">
+                    <div class="p-3 bg-light-subtle border rounded-3">
+                        <div class="text-muted small mb-1">Time Allowed</div>
+                        <h4 class="fw-bold mb-0 text-primary">{{ exam.duration_minutes }} Minutes</h4>
+                    </div>
+                </div>
+                <div class="col-sm-4 text-center">
+                    <div class="p-3 bg-light-subtle border rounded-3">
+                        <div class="text-muted small mb-1">Total Questions</div>
+                        <h4 class="fw-bold mb-0 text-success">{{ exam.total_questions }} MCQs</h4>
+                    </div>
+                </div>
+                <div class="col-sm-4 text-center">
+                    <div class="p-3 bg-light-subtle border rounded-3">
+                        <div class="text-muted small mb-1">Passing Threshold</div>
+                        <h4 class="fw-bold mb-0 text-warning">{{ exam.pass_mark }} / {{ exam.total_marks }} Marks</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions Bullet points -->
+            <div class="mb-4">
+                <h3 class="h5 fw-bold mb-3"><i class="fa-solid fa-circle-info text-info me-2"></i>Rules & Guidelines</h3>
+                <ul class="text-muted list-unstyled d-flex flex-column gap-2 small ps-1">
+                    <li><i class="fa-solid fa-angle-right text-primary me-2"></i><b>Single Attempt:</b> This exam is structured as a single attempt. Bypassing timer constraints is logged.</li>
+                    <li><i class="fa-solid fa-angle-right text-primary me-2"></i><b>Navigation Palette:</b> Change questions freely. Values are auto-saved.</li>
+                    <li><i class="fa-solid fa-angle-right text-primary me-2"></i><b>Webcam Monitoring:</b> Snapshots are captured from your camera feed every 30 seconds to verify identity.</li>
+                    <li class="text-danger fw-semibold"><i class="fa-solid fa-circle-exclamation me-2"></i><b>Anti-Cheating Logs:</b> Tab-switching (blurring page focus), exiting full-screen, or right-clicking is logged. Exceeding 3 tab switches triggers automatic submission.</li>
+                </ul>
+            </div>
+
+            <form action="{{ url_for('exam.start_exam', exam_id=exam.id) }}" method="POST" id="start-exam-form">
+                <!-- Agreement Boxes -->
+                <div class="bg-warning-subtle p-3 rounded-3 mb-3 border border-warning-subtle d-flex align-items-start gap-3">
+                    <input class="form-check-input mt-1 cursor-pointer" type="checkbox" id="agree-policy" onchange="validateCheckboxes();">
+                    <label class="form-check-label small text-warning-emphasis fw-medium cursor-pointer" for="agree-policy">
+                        I confirm that I have read the guidelines and agree to abide by the testing policy, including the anti-cheating regulations.
+                    </label>
+                </div>
+                
+                <div class="bg-primary-subtle p-3 rounded-3 mb-4 border border-primary-subtle d-flex align-items-start gap-3">
+                    <input class="form-check-input mt-1 cursor-pointer" type="checkbox" id="agree-webcam" onchange="validateCheckboxes();">
+                    <label class="form-check-label small text-primary-emphasis fw-medium cursor-pointer" for="agree-webcam">
+                        I consent to the webcam proctoring system capturing snapshots of my face for presence verification during the test duration.
+                    </label>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('student.exams') }}" class="btn btn-outline-secondary px-4 rounded-pill">Back to Catalog</a>
+                    <button type="submit" id="start-btn" class="btn btn-primary px-4 rounded-pill disabled"><i class="fa-solid fa-rocket me-2"></i>Start Examination</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function validateCheckboxes() {
+        const policy = document.getElementById('agree-policy').checked;
+        const webcam = document.getElementById('agree-webcam').checked;
+        const startBtn = document.getElementById('start-btn');
+        
+        if (policy && webcam) {
+            startBtn.classList.remove('disabled');
+        } else {
+            startBtn.classList.add('disabled');
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Exam Review - {{ exam.exam_title }}{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <!-- Result Card Summary -->
+    <div class="col-lg-4">
+        <div class="card card-premium p-4 text-center h-100">
+            <h3 class="h6 fw-bold text-uppercase text-muted mb-3" style="letter-spacing: 0.5px;">Summary Transcript</h3>
+            <div class="display-5 fw-bold text-primary mb-2">{{ result.percentage }}%</div>
+            
+            <div class="mb-3">
+                {% if result.pass_fail_status == 'pass' %}
+                    <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-semibold"><i class="fa-solid fa-square-check me-1"></i>Passed</span>
+                {% else %}
+                    <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill fw-semibold"><i class="fa-solid fa-circle-xmark me-1"></i>Failed</span>
+                {% endif %}
+            </div>
+            
+            <div class="table-responsive text-start border-top pt-3">
+                <table class="table table-sm table-borderless mb-0 small">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted py-2">Marks Obtained:</td>
+                            <td class="fw-bold py-2 text-end">{{ result.obtained_marks }} / {{ result.total_marks }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted py-2">Grade Awarded:</td>
+                            <td class="fw-bold py-2 text-end text-uppercase">{{ result.grade }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted py-2">Date Taken:</td>
+                            <td class="fw-bold py-2 text-end text-muted">{{ result.generated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="d-grid mt-4">
+                <a href="{{ url_for('student.exams') }}" class="btn btn-primary rounded-pill">Back to Catalog</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Question by Question review list -->
+    <div class="col-lg-8">
+        <h3 class="h5 fw-bold mb-3"><i class="fa-solid fa-magnifying-glass-chart me-2 text-info"></i>Detailed Answer Analysis</h3>
+        
+        <div class="d-flex flex-column gap-4">
+            {% for q in questions %}
+                {% set ans = answers_map.get(q.id) %}
+                {% set is_correct = (ans and ans.selected_answer == q.correct_answer) %}
+                
+                <div class="card card-premium p-4 border-start border-4 {{ 'border-start-success' if is_correct else 'border-start-danger' if ans else 'border-start-secondary' }}">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted small fw-semibold">Question {{ loop.index }}</span>
+                        {% if is_correct %}
+                            <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1.5 small"><i class="fa-solid fa-circle-check me-1"></i>Correct</span>
+                        {% elif ans %}
+                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2.5 py-1.5 small"><i class="fa-solid fa-circle-xmark me-1"></i>Incorrect</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1.5 small"><i class="fa-solid fa-circle-minus me-1"></i>Unanswered</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Question text -->
+                    <h4 class="h6 fw-bold mb-3 text-body">{{ q.question_text }}</h4>
+                    
+                    <!-- Options breakdown -->
+                    <div class="d-flex flex-column gap-2 small">
+                        {% if q.options %}
+                            {% set opt = q.options %}
+                            {% set letters = ['A', 'B', 'C', 'D'] %}
+                            {% set options_text = {'A': opt.option_a, 'B': opt.option_b, 'C': opt.option_c, 'D': opt.option_d} %}
+                            
+                            {% for l in letters %}
+                                {% set opt_txt = options_text.get(l) %}
+                                {% if opt_txt %}
+                                    <div class="p-2 border rounded-3 d-flex align-items-center gap-2 
+                                        {% if q.correct_answer == l %}
+                                            border-success bg-success-subtle text-success-emphasis fw-medium
+                                        {% elif ans and ans.selected_answer == l %}
+                                            border-danger bg-danger-subtle text-danger-emphasis
+                                        {% else %}
+                                            bg-light-subtle text-muted
+                                        {% endif %}">
+                                        <div class="badge {% if q.correct_answer == l %}bg-success{% elif ans and ans.selected_answer == l %}bg-danger{% else %}bg-secondary{% endif %} rounded-circle" style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; padding: 0;">{{ l }}</div>
+                                        <div>{{ opt_txt }}</div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

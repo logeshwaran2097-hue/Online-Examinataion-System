@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Overview - EduExam{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'analytics' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-semibold">Analytics Dashboard</h1>
+            </div>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            <!-- Analytics Charts Grid -->
+            <div class="row g-4 mb-4">
+                <!-- Pass / Fail Chart -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-premium p-4 h-100">
+                        <h3 class="h6 fw-bold mb-3"><i class="fa-solid fa-chart-pie me-2 text-success"></i>Global Pass/Fail Rates</h3>
+                        <div style="height: 200px;" class="position-relative">
+                            <canvas id="globalPassFailChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Activity Chart -->
+                <div class="col-md-6 col-lg-8">
+                    <div class="card card-premium p-4 h-100">
+                        <h3 class="h6 fw-bold mb-3"><i class="fa-solid fa-chart-line me-2 text-primary"></i>System Activities Log Count (Past Week)</h3>
+                        <div style="height: 200px;" class="position-relative">
+                            <canvas id="activityLogChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Double Column for Tables -->
+            <div class="row g-4">
+                <!-- Subject Performance Analysis -->
+                <div class="col-lg-7">
+                    <div class="card card-premium p-4 h-100">
+                        <h3 class="h6 fw-bold mb-3"><i class="fa-solid fa-chart-simple me-2 text-info"></i>Subject Attempt & Performance Analytics</h3>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr class="small text-muted">
+                                        <th>Subject Name</th>
+                                        <th>Exams Attempted</th>
+                                        <th>Avg score (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="small">
+                                    {% for item in subj_data %}
+                                    <tr>
+                                        <td class="fw-semibold">{{ item.subject }}</td>
+                                        <td>{{ item.attempts }} attempts</td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="progress flex-grow-1" style="height: 6px; width: 80px;">
+                                                    <div class="progress-bar bg-info" style="width: {{ item.avg_score }}%"></div>
+                                                </div>
+                                                <span class="fw-bold">{{ item.avg_score|round(1) }}%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-3">No subject-wise results recorded.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Leaderboard Table -->
+                <div class="col-lg-5">
+                    <div class="card card-premium p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 class="h6 fw-bold mb-0"><i class="fa-solid fa-trophy me-2 text-warning"></i>Leaderboard Standings</h3>
+                            <span class="badge bg-warning text-dark px-2 rounded-pill small">Top 10</span>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr class="small text-muted">
+                                        <th style="width: 50px;">Rank</th>
+                                        <th>Student</th>
+                                        <th class="text-end">Cum. Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="small">
+                                    {% for row in lead_data %}
+                                    <tr>
+                                        <td class="text-center fw-bold">
+                                            {% if row.rank == 1 %}
+                                            <i class="fa-solid fa-crown text-warning fs-6" title="1st Place"></i>
+                                            {% elif row.rank == 2 %}
+                                            <span class="text-secondary">#2</span>
+                                            {% elif row.rank == 3 %}
+                                            <span class="text-danger">#3</span>
+                                            {% else %}
+                                            #{{ row.rank }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold">{{ row.name }}</div>
+                                            <div class="text-muted small">{{ row.department }}</div>
+                                        </td>
+                                        <td class="text-end fw-bold text-primary">{{ row.score }} pts</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-3">Leaderboard is empty. Compile scores to generate.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Pass Fail Chart (Doughnut)
+        const passFailData = {{ pass_fail_data|tojson }};
+        const passCount = passFailData.pass || 0;
+        const failCount = passFailData.fail || 0;
+        
+        const pfCtx = document.getElementById('globalPassFailChart');
+        if (pfCtx) {
+            new Chart(pfCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pass', 'Fail'],
+                    datasets: [{
+                        data: [passCount, failCount],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Activity logs chart (Line chart)
+        const activityRaw = {{ activity_data|tojson }};
+        const actLabels = activityRaw.map(item => item.date);
+        const actCounts = activityRaw.map(item => item.count);
+
+        const actCtx = document.getElementById('activityLogChart');
+        if (actCtx) {
+            new Chart(actCtx, {
+                type: 'line',
+                data: {
+                    labels: actLabels,
+                    datasets: [{
+                        label: 'System Actions',
+                        data: actCounts,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

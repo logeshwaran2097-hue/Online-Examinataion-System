@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings - EduExam{% endblock %}
+
+{% block block_class %}bg-light-subtle{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'settings' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-semibold">Settings</h1>
+            </div>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 small py-2 px-3 mb-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="row g-4">
+                <!-- Change Password -->
+                <div class="col-md-6 col-12">
+                    <div class="card card-premium p-4">
+                        <h3 class="h6 fw-bold mb-3"><i class="fa-solid fa-key me-1 text-warning"></i>Change Admin Password</h3>
+                        <p class="text-muted small">Update your console access credentials periodically to protect your system records.</p>
+                        
+                        <form action="{{ url_for('admin.settings') }}" method="POST" class="needs-validation" novalidate>
+                            <!-- Current Password -->
+                            <div class="mb-3">
+                                <label for="current_password" class="form-label small text-muted">Current Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-lock"></i></span>
+                                    <input type="password" class="form-control border-start-0 ps-0 border-end-0" id="current_password" name="current_password" placeholder="••••••••" required>
+                                    <button class="btn btn-outline-secondary border-start-0 bg-transparent border-end border-top border-bottom text-muted password-toggle" type="button" data-target="current_password">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <div class="invalid-feedback">Current password is required.</div>
+                                </div>
+                            </div>
+
+                            <!-- New Password -->
+                            <div class="mb-3">
+                                <label for="new_password" class="form-label small text-muted">New Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-lock-open"></i></span>
+                                    <input type="password" class="form-control border-start-0 ps-0 border-end-0" id="new_password" name="new_password" placeholder="••••••••" required minlength="8">
+                                    <button class="btn btn-outline-secondary border-start-0 bg-transparent border-end border-top border-bottom text-muted password-toggle" type="button" data-target="new_password">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <div class="invalid-feedback">Please enter a new password (min 8 characters).</div>
+                                </div>
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="mb-4">
+                                <label for="confirm_password" class="form-label small text-muted">Confirm New Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-check-double"></i></span>
+                                    <input type="password" class="form-control border-start-0 ps-0 border-end-0" id="confirm_password" name="confirm_password" placeholder="••••••••" required>
+                                    <button class="btn btn-outline-secondary border-start-0 bg-transparent border-end border-top border-bottom text-muted password-toggle" type="button" data-target="confirm_password">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <div class="invalid-feedback" id="confirm-feedback">Please confirm your new password.</div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-warning w-100 py-2 text-dark fw-bold"><i class="fa-solid fa-save me-1"></i> Update Password</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Info panel -->
+                <div class="col-md-6 col-12">
+                    <div class="card card-premium p-4 h-100">
+                        <h3 class="h6 fw-bold mb-3"><i class="fa-solid fa-circle-info me-1 text-primary"></i>System Security Information</h3>
+                        <p class="small text-muted mb-2">Logged in as: <code>{{ current_user.username }}</code> (Role: <code>{{ current_user.role }}</code>)</p>
+                        <p class="small text-muted mb-2">Registered email: <code>{{ current_user.email }}</code></p>
+                        <p class="small text-muted mb-4">Last console authentication: <code>{{ current_user.last_login.strftime('%Y-%m-%d %H:%M:%S') if current_user.last_login else 'N/A' }}</code></p>
+                        
+                        <div class="border-top pt-3">
+                            <h4 class="h6 fw-bold text-muted mb-2">Proctoring Metrics Config</h4>
+                            <p class="small text-muted mb-0">Tab change limits are monitored on exams. Suspicious activity flags trigger warning logs immediately to live proctor dashboards.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const password = document.getElementById('new_password');
+        const confirm = document.getElementById('confirm_password');
+        const confirmFeedback = document.getElementById('confirm-feedback');
+
+        function validatePasswords() {
+            if (password.value !== confirm.value) {
+                confirm.setCustomValidity('Passwords do not match');
+                confirmFeedback.textContent = 'Passwords do not match.';
+            } else {
+                confirm.setCustomValidity('');
+                confirmFeedback.textContent = 'Please confirm your new password.';
+            }
+        }
+        
+        password.addEventListener('change', validatePasswords);
+        confirm.addEventListener('keyup', validatePasswords);
+
+        // Bootstrap standard validation hook
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                validatePasswords();
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
+{% endblock %}

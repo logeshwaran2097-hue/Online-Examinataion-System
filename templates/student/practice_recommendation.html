@@ -1,0 +1,108 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}AI Question Recommendations - EduExam{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-md-10">
+        <!-- Main Card Header -->
+        <div class="card card-premium p-4 mb-4 bg-dark text-white border-0" style="background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%) !important;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge bg-warning-subtle text-warning rounded-pill mb-2 px-3 py-1.5 fw-semibold"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>AI Recommendation Engine</span>
+                    <h2 class="fw-bold mb-1">Personalized Learning Recommendations</h2>
+                    <p class="text-white-50 small mb-0">Custom study targets based on weak areas identified in past exam sessions.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- Focus Area Diagnostic -->
+            <div class="col-md-6">
+                <div class="card card-premium p-4 h-100">
+                    <h3 class="h6 fw-bold text-uppercase text-muted mb-3" style="letter-spacing: 0.5px;">Recommended Focus Subject</h3>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="fa-solid fa-book-open-reader fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">We advise practicing:</div>
+                            <h4 class="fw-bold text-body mb-0 h5">{{ recommendations.weak_subject }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Target Difficulty Recommendation -->
+            <div class="col-md-6">
+                <div class="card card-premium p-4 h-100">
+                    <h3 class="h6 fw-bold text-uppercase text-muted mb-3" style="letter-spacing: 0.5px;">Suggested Practice Level</h3>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="fa-solid fa-gauge-high fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Target difficulty:</div>
+                            <h4 class="fw-bold text-capitalize text-body mb-0 h5">{{ recommendations.recommended_difficulty }} Questions</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommended Topics Bullet Guidelines -->
+        <div class="card card-premium p-4 mb-4">
+            <h3 class="h6 fw-bold text-uppercase text-muted mb-3" style="letter-spacing: 0.5px;"><i class="fa-solid fa-circle-nodes text-primary me-2"></i>Key Topics to Review</h3>
+            <ul class="list-unstyled d-flex flex-column gap-2 mb-0 small text-muted ps-1">
+                {% for topic in recommendations.recommended_topics %}
+                    <li><i class="fa-solid fa-chevron-right text-primary me-2"></i>{{ topic }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Suggested Question list Cards -->
+        <h3 class="h5 fw-bold mb-3"><i class="fa-solid fa-circle-question text-secondary me-2"></i>Practice Questions Selection</h3>
+        <div class="d-flex flex-column gap-3 mb-4">
+            {% if recommendations.recommended_questions %}
+                {% for q in recommendations.recommended_questions %}
+                    <div class="card card-premium p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small font-monospace">Practice MCQ {{ loop.index }}</span>
+                            <span class="badge bg-secondary-subtle text-secondary text-uppercase small">{{ q.difficulty_level }}</span>
+                        </div>
+                        <h4 class="h6 fw-bold text-body mb-3">{{ q.question_text }}</h4>
+                        
+                        <!-- Renders options list as text values -->
+                        {% if q.options %}
+                            <div class="row g-2 small text-muted ps-1">
+                                {% if q.options.option_a %}
+                                    <div class="col-sm-6"><b>(A)</b> {{ q.options.option_a }}</div>
+                                {% endif %}
+                                {% if q.options.option_b %}
+                                    <div class="col-sm-6"><b>(B)</b> {{ q.options.option_b }}</div>
+                                {% endif %}
+                                {% if q.options.option_c %}
+                                    <div class="col-sm-6"><b>(C)</b> {{ q.options.option_c }}</div>
+                                {% endif %}
+                                {% if q.options.option_d %}
+                                    <div class="col-sm-6"><b>(D)</b> {{ q.options.option_d }}</div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="card card-premium p-5 text-center text-muted">
+                    <i class="fa-solid fa-circle-question fs-2 mb-3 text-secondary"></i>
+                    <p class="small mb-0">No specific practice questions are mapped for this subject yet. Review your syllabus guidelines.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Back shortcut -->
+        <div class="d-grid col-sm-6 mx-auto mb-4">
+            <a href="{{ url_for('analytics_bp.index') }}" class="btn btn-outline-secondary rounded-pill"><i class="fa-solid fa-arrow-left me-2"></i>Back to Analytics</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

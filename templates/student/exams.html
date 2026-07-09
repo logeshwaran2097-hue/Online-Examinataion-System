@@ -1,0 +1,101 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Available Examinations - EduExam{% endblock %}
+
+{% block content %}
+<div class="card card-premium p-4 mb-4">
+    <div class="row g-3 align-items-center justify-content-between">
+        <div class="col-md-4">
+            <h3 class="h4 mb-0 fw-bold"><i class="fa-solid fa-clipboard-list text-primary me-2"></i>Examinations Portal</h3>
+            <p class="text-muted small mb-0">Browse and launch assessments assigned to your profile.</p>
+        </div>
+        <div class="col-md-8">
+            <form action="{{ url_for('student.exams') }}" method="GET" class="row g-2 justify-content-md-end">
+                <!-- Search bar -->
+                <div class="col-sm-5 col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" class="form-control border-start-0 rounded-end-3" name="search" value="{{ search_query }}" placeholder="Search exam title...">
+                    </div>
+                </div>
+                <!-- Subject Filter -->
+                <div class="col-sm-4 col-md-4">
+                    <select class="form-select rounded-3" name="subject">
+                        <option value="">All Subjects</option>
+                        {% for subj in subjects %}
+                            <option value="{{ subj }}" {% if subject_filter == subj %}selected{% endif %}>{{ subj }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- Submit -->
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary px-3 rounded-pill"><i class="fa-solid fa-filter me-1"></i>Apply</button>
+                    {% if search_query or subject_filter %}
+                        <a href="{{ url_for('student.exams') }}" class="btn btn-outline-secondary px-3 rounded-pill">Reset</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- List of exams -->
+<div class="row g-4">
+    {% if exams %}
+        {% for exam in exams %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-premium p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <!-- Header / Category -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-primary-subtle text-primary rounded-pill small">{{ exam.subject_name }}</span>
+                            <span class="badge {{ 'bg-success-subtle text-success' if exam.status == 'ongoing' else 'bg-warning-subtle text-warning' }} rounded-pill text-uppercase small" style="font-size: 0.7rem;">
+                                <i class="fa-solid fa-circle me-1" style="font-size: 0.5rem;"></i> {{ exam.status }}
+                            </span>
+                        </div>
+                        
+                        <!-- Title & Description -->
+                        <h4 class="h6 mb-2 fw-bold text-truncate-2" style="min-height: 2.4rem;">{{ exam.exam_title }}</h4>
+                        <p class="text-muted small text-truncate-3 mb-4">{{ exam.description or 'No details available.' }}</p>
+                        
+                        <!-- Stats details -->
+                        <div class="border-top border-light-subtle pt-3 mb-4">
+                            <div class="row text-center g-2">
+                                <div class="col-4 border-end border-light-subtle">
+                                    <div class="fw-bold text-body" style="font-size: 0.95rem;">{{ exam.total_questions }}</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Questions</div>
+                                </div>
+                                <div class="col-4 border-end border-light-subtle">
+                                    <div class="fw-bold text-body" style="font-size: 0.95rem;">{{ exam.duration_minutes }}m</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Duration</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fw-bold text-body" style="font-size: 0.95rem;">{{ exam.total_marks }}</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Marks</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div class="d-grid mt-auto">
+                        {% if exam.id in completed_exam_ids %}
+                            <button class="btn btn-outline-success rounded-pill" disabled><i class="fa-solid fa-circle-check me-2"></i>Attempt Completed</button>
+                        {% else %}
+                            <a href="{{ url_for('student.exam_instructions', exam_id=exam.id) }}" class="btn btn-primary rounded-pill"><i class="fa-solid fa-play me-2"></i>Enter Assessment</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="card card-premium p-5 text-center text-muted">
+                <i class="fa-solid fa-circle-info fs-1 mb-3 text-secondary"></i>
+                <h5>No Exams Found</h5>
+                <p class="small mb-0">Try adjusting your filters or contact the administration team if you think this is a mistake.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Live Exam Proctoring - EduExam{% endblock %}
+
+{% block extra_css %}
+<style>
+    .proctor-card {
+        border-radius: 16px;
+        transition: all 0.3s ease;
+    }
+    .proctor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .webcam-feed-placeholder {
+        width: 100%;
+        aspect-ratio: 4/3;
+        background-color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+    }
+    .webcam-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .live-dot {
+        width: 10px;
+        height: 10px;
+        background-color: #ef4444;
+        border-radius: 50%;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4);
+    }
+    .log-box {
+        max-height: 80px;
+        overflow-y: auto;
+        font-family: monospace;
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'monitoring' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-bold">Live Exam Monitor</h1>
+            </div>
+            <span class="badge bg-danger px-3 py-1.5 rounded-pill"><i class="fa-solid fa-circle me-1 animate-pulse"></i>Proctor Active</span>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            <!-- Summary stats -->
+            <div class="row g-4 mb-4">
+                <div class="col-sm-6 col-md-4">
+                    <div class="card card-premium p-3 text-center">
+                        <div class="text-primary mb-1"><i class="fa-solid fa-users fs-3"></i></div>
+                        <div class="h4 mb-0 fw-bold">{{ sessions|length }}</div>
+                        <div class="text-muted small">Students Online</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List Grid of student feeds -->
+            <div class="row g-4">
+                {% if sessions %}
+                    {% for sess in sessions %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card card-premium p-3 proctor-card {% if sess.tab_switches >= 3 %}border-danger bg-danger-subtle bg-opacity-10{% endif %}">
+                                <!-- Student title details -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h4 class="h6 mb-0 fw-bold text-body">{{ sess.student_name }}</h4>
+                                        <span class="text-muted small" style="font-size: 0.75rem;">{{ sess.student_email }}</span>
+                                    </div>
+                                    <span class="badge bg-success-subtle text-success px-2 py-1 rounded-3 small">Active</span>
+                                </div>
+
+                                <!-- Webcam Snapshot frame -->
+                                <div class="webcam-feed-placeholder mb-3">
+                                    {% if sess.webcam_image %}
+                                        <div class="live-dot animate-pulse"></div>
+                                        <img src="{{ sess.webcam_image }}" class="webcam-img" alt="Webcam Feed">
+                                    {% else %}
+                                        <div class="text-center text-white-50 small">
+                                            <i class="fa-solid fa-video-slash fs-2 mb-2 d-block text-secondary"></i>
+                                            Webcam Connection Offline
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Violation warning details -->
+                                <div class="small mb-3 border-top pt-2">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Exam Paper:</span>
+                                        <span class="fw-semibold text-primary text-truncate" style="max-width: 150px;">{{ sess.exam_title }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Check-in:</span>
+                                        <span class="text-body fw-medium">{{ sess.login_time }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Tab Switches:</span>
+                                        <span class="badge {% if sess.tab_switches >= 3 %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill">{{ sess.tab_switches }} / 3 warnings</span>
+                                    </div>
+                                </div>
+
+                                <!-- Proctor log -->
+                                <div class="bg-light-subtle rounded-3 p-2 log-box mb-3 text-muted border">
+                                    {{ sess.suspicious_log }}
+                                </div>
+
+                                <!-- Admin Force Actions -->
+                                <div class="d-grid">
+                                    <form action="{{ url_for('exam.force_submit', attendance_id=sess.attendance_id) }}" method="POST" onsubmit="return confirm('Force submit examination for this student? This terminates their attempt immediately.');">
+                                        <button type="submit" class="btn btn-danger btn-sm rounded-pill w-100"><i class="fa-solid fa-circle-xmark me-2"></i>Terminate & Submit</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="card card-premium p-5 text-center text-muted">
+                            <i class="fa-solid fa-video-slash fs-1 mb-3 text-secondary"></i>
+                            <h5>No Active Examination Sessions</h5>
+                            <p class="small mb-0">When students begin their exam attempts in proctored mode, their webcams feeds and switch trackers will appear here in real time.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

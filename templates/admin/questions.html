@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Question Bank - EduExam{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'questions' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-semibold">Question Bank</h1>
+            </div>
+            <a href="{{ url_for('admin.add_question') }}" class="btn btn-primary btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-plus me-1"></i> Add Question
+            </a>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 small py-2 px-3 mb-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Exam Selector Filter -->
+            <div class="card card-premium p-4 mb-4">
+                <form method="GET" action="{{ url_for('admin.questions') }}" class="row g-3">
+                    <div class="col-md-9">
+                        <label for="exam_id" class="form-label small fw-medium text-muted">Select Examination Template</label>
+                        <select class="form-select" id="exam_id" name="exam_id" onchange="this.form.submit()">
+                            <option value="">All Questions (Global List)</option>
+                            {% for exam in exams %}
+                            <option value="{{ exam.id }}" {% if selected_exam_id == exam.id|string or selected_exam_id == exam.id %}selected{% endif %}>{{ exam.exam_title }} ({{ exam.subject_name }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-outline-secondary w-100 py-2"><i class="fa-solid fa-sync me-1"></i> Refresh</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Questions Ledger -->
+            <div class="card card-premium p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h6 fw-bold mb-0">Registered Questions</h3>
+                    <span class="badge bg-primary rounded-pill px-2.5">{{ questions|length }} Total</span>
+                </div>
+                
+                <div class="d-flex flex-column gap-3">
+                    {% for q in questions %}
+                    <div class="border rounded-3 p-3 bg-light-subtle position-relative shadow-sm">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="badge bg-secondary-subtle text-muted border px-2 py-0.5 small me-1">Q-ID: {{ q.id }}</span>
+                                <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-0.5 small me-1">{{ q.exam.exam_title }}</span>
+                                <span class="badge {% if q.difficulty_level == 'easy' %}bg-success-subtle text-success border border-success-subtle{% elif q.difficulty_level == 'medium' %}bg-warning-subtle text-warning border border-warning-subtle{% else %}bg-danger-subtle text-danger border border-danger-subtle{% endif %} px-2 py-0.5 small">{{ q.difficulty_level|title }}</span>
+                            </div>
+                            
+                            <form action="{{ url_for('admin.delete_question', q_id=q.id) }}" method="POST" onsubmit="return confirm('Remove this question from the exam template?');">
+                                <button type="submit" class="btn btn-link text-danger p-0" title="Delete Question">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Question Text -->
+                        <h4 class="h6 fw-bold mb-3">{{ loop.index }}. {{ q.question_text }}</h4>
+                        
+                        <!-- MCQ Options -->
+                        {% if q.question_type == 'mcq' and q.options %}
+                        <div class="row g-2 mb-2 small">
+                            <div class="col-md-6 text-muted"><span class="fw-semibold text-reset me-1">A.</span> {{ q.options.option_a }}</div>
+                            <div class="col-md-6 text-muted"><span class="fw-semibold text-reset me-1">B.</span> {{ q.options.option_b }}</div>
+                            <div class="col-md-6 text-muted"><span class="fw-semibold text-reset me-1">C.</span> {{ q.options.option_c }}</div>
+                            <div class="col-md-6 text-muted"><span class="fw-semibold text-reset me-1">D.</span> {{ q.options.option_d }}</div>
+                        </div>
+                        {% endif %}
+
+                        <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center small text-muted">
+                            <div>
+                                <span>Correct Choice: <b class="text-success">{{ q.correct_answer }}</b></span>
+                            </div>
+                            <div>
+                                <span>Marks: <b class="text-primary">{{ q.marks }} pt</b></span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center text-muted py-4">No questions are registered in this database filter. Add new questions above.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}

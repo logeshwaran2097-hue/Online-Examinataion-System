@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Credentials - EduExam{% endblock %}
+
+{% block body %}
+<div class="container py-5 d-flex flex-column align-items-center justify-content-center min-vh-100 animate-fade-in">
+    <!-- Brand header -->
+    <div class="mb-4 text-center">
+        <span class="fs-3 fw-bold text-primary"><i class="fa-solid fa-graduation-cap me-2"></i>EduExam</span>
+        <h2 class="h5 text-muted mt-1">Academic Credentials Verification Portal</h2>
+    </div>
+
+    <div class="col-md-8 col-lg-6 w-100" style="max-width: 540px;">
+        {% if cert %}
+            <!-- Verified Card -->
+            <div class="card card-premium p-4 text-center border-success bg-success-subtle shadow-lg">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center" style="width: 72px; height: 72px; border: 4px solid white;">
+                        <i class="fa-solid fa-circle-check fs-1"></i>
+                    </div>
+                </div>
+                
+                <h3 class="fw-bold text-success mb-1">Credentials Validated</h3>
+                <p class="text-success-emphasis small mb-4">This certificate has been verified as authentic and issued by EduExam Academy.</p>
+                
+                <div class="bg-white border rounded-3 p-3 text-start mb-4 shadow-sm text-body">
+                    <table class="table table-sm table-borderless mb-0 small text-body">
+                        <tbody>
+                            <tr class="border-bottom">
+                                <td class="text-muted py-2" style="width: 40%;">Recipient Name</td>
+                                <td class="fw-bold py-2">{{ cert.student.full_name }}</td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td class="text-muted py-2">Exam Subject</td>
+                                <td class="fw-bold py-2">{{ cert.exam.exam_title }}</td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td class="text-muted py-2">Grade / Score</td>
+                                <td class="fw-bold py-2 text-success">{{ result.grade }} ({{ result.percentage }}%)</td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td class="text-muted py-2">Certificate Serial</td>
+                                <td class="fw-bold py-2 text-muted" style="font-family: monospace;">{{ cert_no }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted py-2">Issue Date</td>
+                                <td class="fw-bold py-2 text-muted">{{ cert.generated_date.strftime('%B %d, %Y') }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="text-muted small">
+                    Verify date: {{ current_time or '2026-07-01' }}
+                </div>
+            </div>
+        {% else %}
+            <!-- Invalid Card -->
+            <div class="card card-premium p-4 text-center border-danger bg-danger-subtle shadow-lg">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-danger text-white d-inline-flex align-items-center justify-content-center" style="width: 72px; height: 72px; border: 4px solid white;">
+                        <i class="fa-solid fa-circle-xmark fs-1"></i>
+                    </div>
+                </div>
+                
+                <h3 class="fw-bold text-danger mb-1">Invalid Certificate</h3>
+                <p class="text-danger-emphasis small mb-4">The credential with serial number below could not be verified. It may be forged or revoked.</p>
+                
+                <div class="bg-white border rounded-3 p-3 text-center mb-4 shadow-sm text-body">
+                    <div class="text-muted small mb-1">Serial Searched:</div>
+                    <div class="fw-bold text-danger text-truncate" style="font-family: monospace;">{{ cert_no }}</div>
+                </div>
+                
+                <div class="d-grid">
+                    <a href="/" class="btn btn-danger rounded-pill">Back to Home</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Small footer link -->
+    <div class="mt-4 text-center text-muted small">
+        &copy; 2026 EduExam Academy. All rights reserved.
+    </div>
+</div>
+{% endblock %}

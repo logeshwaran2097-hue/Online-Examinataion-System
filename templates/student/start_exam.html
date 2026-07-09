@@ -1,0 +1,149 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Calibrating System - EduExam{% endblock %}
+
+{% block extra_css %}
+<style>
+    .camera-container {
+        width: 100%;
+        max-width: 320px;
+        aspect-ratio: 4/3;
+        background-color: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        margin: 0 auto 20px auto;
+        position: relative;
+        border: 3px solid var(--border-color);
+    }
+    #calibration-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .status-badge {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-7">
+        <div class="card card-premium p-4 text-center">
+            <h3 class="h4 fw-bold mb-3"><i class="fa-solid fa-camera-rotate text-primary me-2"></i>System & Proctor Calibration</h3>
+            <p class="text-muted small mb-4">Please grant access to your camera and proceed in full-screen mode to begin the test.</p>
+
+            <!-- Video feed -->
+            <div class="camera-container">
+                <video id="calibration-video" autoplay playsinline></video>
+                <div class="status-badge">
+                    <span id="camera-status" class="badge bg-danger rounded-pill">Offline</span>
+                </div>
+            </div>
+
+            <!-- Verification list -->
+            <div class="text-start col-sm-10 col-md-8 mx-auto mb-4 small text-muted">
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span><i class="fa-solid fa-circle-check text-success me-2"></i>User Authentication Verified</span>
+                    <span class="fw-bold text-success">Verified</span>
+                </div>
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span><i class="fa-solid fa-video me-2"></i>Camera Connection Status</span>
+                    <span class="fw-bold text-danger" id="text-cam-status">Pending Connection</span>
+                </div>
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span><i class="fa-solid fa-maximize me-2"></i>Fullscreen Authorization</span>
+                    <span class="fw-bold text-danger" id="text-screen-status">Pending Action</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-grid col-sm-10 col-md-8 mx-auto">
+                <button type="button" id="proceed-btn" class="btn btn-primary rounded-pill py-2.5 fw-bold disabled" onclick="launchFullscreenAndProceed();">
+                    <i class="fa-solid fa-expand me-2"></i>Request Fullscreen & Proceed
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const video = document.getElementById('calibration-video');
+    const camStatusBadge = document.getElementById('camera-status');
+    const textCamStatus = document.getElementById('text-cam-status');
+    const textScreenStatus = document.getElementById('text-screen-status');
+    const proceedBtn = document.getElementById('proceed-btn');
+    let streamActive = false;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Request camera stream
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+                streamActive = true;
+                camStatusBadge.className = "badge bg-success rounded-pill";
+                camStatusBadge.textContent = "Online";
+                textCamStatus.className = "fw-bold text-success";
+                textCamStatus.textContent = "Connected";
+                
+                checkProceedReady();
+            })
+            .catch(err => {
+                console.error("Camera access error: ", err);
+                camStatusBadge.className = "badge bg-danger rounded-pill";
+                camStatusBadge.textContent = "Access Denied";
+                textCamStatus.className = "fw-bold text-danger";
+                textCamStatus.textContent = "Denied";
+            });
+            
+        // Check fullscreen status change
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                textScreenStatus.className = "fw-bold text-success";
+                textScreenStatus.textContent = "Authorized";
+                checkProceedReady();
+            } else {
+                textScreenStatus.className = "fw-bold text-danger";
+                textScreenStatus.textContent = "Pending Action";
+                proceedBtn.classList.add('disabled');
+            }
+        });
+    });
+
+    function checkProceedReady() {
+        if (streamActive) {
+            proceedBtn.classList.remove('disabled');
+        }
+    }
+
+    function launchFullscreenAndProceed() {
+        if (!streamActive) return;
+        
+        // Launch fullscreen
+        const docEl = document.documentElement;
+        const requestFS = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+        
+        if (requestFS) {
+            requestFS.call(docEl).then(() => {
+                // Stop local camera stream before redirecting so take_exam can claim it
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }
+                // Redirect to take exam view
+                window.location.href = "{{ url_for('exam.take_exam_view', exam_id=exam.id) }}";
+            }).catch(err => {
+                console.error("Fullscreen launch error: ", err);
+            });
+        } else {
+            // Fallback if full screen unsupported
+            window.location.href = "{{ url_for('exam.take_exam_view', exam_id=exam.id) }}";
+        }
+    }
+</script>
+{% endblock %}

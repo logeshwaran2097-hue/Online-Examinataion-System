@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Exams - EduExam{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'exams' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-semibold">Examinations</h1>
+            </div>
+            <a href="{{ url_for('admin.add_exam') }}" class="btn btn-primary btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-plus me-1"></i> Create Exam
+            </a>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 small py-2 px-3 mb-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="card card-premium p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="small text-muted">
+                                <th>Exam Details</th>
+                                <th>Subject</th>
+                                <th>Duration</th>
+                                <th>Pass Mark</th>
+                                <th>Total Questions</th>
+                                <th>Schedule</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small">
+                            {% for exam in exams %}
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold text-primary">{{ exam.exam_title }}</div>
+                                    <div class="text-muted small">{{ exam.description[:60] if exam.description else 'No description' }}...</div>
+                                </td>
+                                <td class="fw-medium">{{ exam.subject_name }}</td>
+                                <td>{{ exam.duration_minutes }} Min</td>
+                                <td>{{ exam.pass_mark }}/{{ exam.total_marks }}</td>
+                                <td>
+                                    <span class="badge bg-secondary rounded-pill px-2.5 py-1">{{ exam.total_questions }} Qs</span>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">{{ exam.exam_date.strftime('%Y-%m-%d') if exam.exam_date else 'N/A' }}</div>
+                                    <div class="text-muted small">{{ exam.start_time.strftime('%H:%M') if exam.start_time else '' }} - {{ exam.end_time.strftime('%H:%M') if exam.end_time else '' }}</div>
+                                </td>
+                                <td>
+                                    {% if exam.status == 'upcoming' %}
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1">Upcoming</span>
+                                    {% elif exam.status == 'ongoing' %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">Ongoing</span>
+                                    {% elif exam.status == 'completed' %}
+                                    <span class="badge bg-secondary-subtle text-muted border border-secondary-subtle rounded-pill px-2.5 py-1">Completed</span>
+                                    {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1">{{ exam.status.upper() }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end gap-1">
+                                        <a href="{{ url_for('admin.questions', exam_id=exam.id) }}" class="btn btn-outline-secondary btn-sm rounded-3 px-2 py-1" title="Question Bank">
+                                            <i class="fa-solid fa-folder-open"></i>
+                                        </a>
+                                        <a href="{{ url_for('admin.edit_exam', exam_id=exam.id) }}" class="btn btn-outline-secondary btn-sm rounded-3 px-2 py-1" title="Edit Properties">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+                                        <form action="{{ url_for('admin.toggle_exam_status', exam_id=exam.id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-primary btn-sm rounded-3 px-2 py-1" title="Toggle active status">
+                                                <i class="fa-solid fa-rotate"></i>
+                                            </button>
+                                        </form>
+                                        <form action="{{ url_for('admin.delete_exam', exam_id=exam.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this exam template? All questions will be lost.');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-3 px-2 py-1" title="Delete Exam">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">No examinations have been created yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}

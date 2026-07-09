@@ -1,0 +1,41 @@
+# ── Compiled Python ──────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*$py.class
+
+# ── Virtual environment ───────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Environment secrets ───────────────────────────────────────
+.env
+
+# ── Database files ────────────────────────────────────────────
+*.db
+*.sqlite3
+instance/
+
+# ── Upload artifacts (keep folder structure via .gitkeep) ────
+uploads/proctoring/*
+uploads/profiles/*
+!uploads/proctoring/.gitkeep
+!uploads/profiles/.gitkeep
+
+# ── Logs ──────────────────────────────────────────────────────
+logs/*.log
+!logs/.gitkeep
+
+# ── Reports ───────────────────────────────────────────────────
+reports/*.pdf
+reports/*.xlsx
+reports/*.csv
+!reports/.gitkeep
+
+# ── OS & editor ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp

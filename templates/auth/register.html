@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Student Register - Online Examination System{% endblock %}
+
+{% block body %}
+<div class="min-vh-100 d-flex flex-column justify-content-center align-items-center py-5 bg-light-subtle">
+    <div class="container d-flex justify-content-end max-w-lg mb-3" style="max-width: 520px; width: 100%;">
+        <a href="#" id="theme-toggle" class="btn btn-link text-reset p-2">
+            <i class="fa-solid fa-moon fs-5"></i>
+        </a>
+    </div>
+
+    <div class="card card-premium shadow-lg p-4 p-md-5 animate-fade-in" style="max-width: 520px; width: 100%;">
+        <div class="text-center mb-4">
+            <a href="{{ url_for('main.index') }}" class="text-decoration-none text-reset">
+                <span class="fs-3 fw-bold text-primary"><i class="fa-solid fa-graduation-cap me-2"></i>EduExam</span>
+            </a>
+            <h1 class="h4 mt-3 fw-bold">Student Registration</h1>
+            <p class="text-muted small">Register to create an examination account</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 small py-2 px-3 mb-3" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.75rem 1rem;"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('auth.register') }}" method="POST" class="needs-validation" novalidate>
+            <!-- Full Name -->
+            <div class="mb-3">
+                <label for="name" class="form-label small fw-medium">Full Name</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0" id="name" name="name" placeholder="John Doe" required>
+                    <div class="invalid-feedback">Please enter your full name.</div>
+                </div>
+            </div>
+
+            <!-- Email & Phone (Grid) -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label small fw-medium">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="john@example.com" required>
+                    <div class="invalid-feedback">Valid email required.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="phone" class="form-label small fw-medium">Phone Number</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="+1 555-0199" required>
+                    <div class="invalid-feedback">Phone number required.</div>
+                </div>
+            </div>
+
+            <!-- Year of Study & Department (Grid) -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="year_of_study" class="form-label small fw-medium">Year of Study</label>
+                    <select class="form-select" id="year_of_study" name="year_of_study" required>
+                        <option value="" disabled selected>Select Year</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                        <option value="5">5th Year</option>
+                        <option value="6">6th Year</option>
+                        <option value="7">7th Year</option>
+                        <option value="8">8th Year</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a year of study.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="department" class="form-label small fw-medium">Department</label>
+                    <select class="form-select" id="department" name="department" required>
+                        <option value="" disabled selected>Select Dept</option>
+                        <option value="CSE">Computer Science</option>
+                        <option value="IT">Information Technology</option>
+                        <option value="ECE">Electronics</option>
+                        <option value="MECH">Mechanical</option>
+                        <option value="CIVIL">Civil</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a department.</div>
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+                <label for="password" class="form-label small fw-medium">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" class="form-control border-start-0 ps-0 border-end-0" id="password" name="password" placeholder="••••••••" required minlength="8">
+                    <button class="btn btn-outline-secondary border-start-0 bg-transparent border-end border-top border-bottom text-muted password-toggle" type="button" data-target="password">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <div class="invalid-feedback">Password of at least 8 characters is required.</div>
+                </div>
+                <div class="progress mt-2" style="height: 5px; display: none;" id="pw-strength-container">
+                    <div class="progress-bar" id="pw-strength-bar" role="progressbar" style="width: 0%;"></div>
+                </div>
+                <small class="form-text small" id="pw-strength-text"></small>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="mb-4">
+                <label for="confirm_password" class="form-label small fw-medium">Confirm Password</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-check-double"></i></span>
+                    <input type="password" class="form-control border-start-0 ps-0 border-end-0" id="confirm_password" name="confirm_password" placeholder="••••••••" required>
+                    <button class="btn btn-outline-secondary border-start-0 bg-transparent border-end border-top border-bottom text-muted password-toggle" type="button" data-target="confirm_password">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <div class="invalid-feedback" id="confirm-feedback">Please confirm your password.</div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3 fw-semibold">Sign Up</button>
+        </form>
+
+        <div class="text-center mt-4">
+            <p class="small text-muted mb-0">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-semibold">Sign In</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const password = document.getElementById('password');
+        const confirm = document.getElementById('confirm_password');
+        const strengthBar = document.getElementById('pw-strength-bar');
+        const strengthContainer = document.getElementById('pw-strength-container');
+        const strengthText = document.getElementById('pw-strength-text');
+        const confirmFeedback = document.getElementById('confirm-feedback');
+        
+        password.addEventListener('input', () => {
+            const val = password.value;
+            if (val === '') {
+                strengthContainer.style.display = 'none';
+                strengthText.textContent = '';
+                return;
+            }
+            
+            strengthContainer.style.display = 'flex';
+            let score = 0;
+            if (val.length >= 8) score++;
+            if (/[A-Z]/.test(val)) score++;
+            if (/[a-z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+            
+            let pct = (score / 5) * 100;
+            strengthBar.style.width = pct + '%';
+            
+            if (score <= 2) {
+                strengthBar.className = 'progress-bar bg-danger';
+                strengthText.textContent = 'Password strength: Weak';
+                strengthText.className = 'form-text small text-danger';
+            } else if (score <= 4) {
+                strengthBar.className = 'progress-bar bg-warning';
+                strengthText.textContent = 'Password strength: Medium';
+                strengthText.className = 'form-text small text-warning';
+            } else {
+                strengthBar.className = 'progress-bar bg-success';
+                strengthText.textContent = 'Password strength: Strong';
+                strengthText.className = 'form-text small text-success';
+            }
+        });
+        
+        function validatePasswords() {
+            if (password.value !== confirm.value) {
+                confirm.setCustomValidity('Passwords do not match');
+                confirmFeedback.textContent = 'Passwords do not match.';
+            } else {
+                confirm.setCustomValidity('');
+                confirmFeedback.textContent = 'Please confirm your password.';
+            }
+        }
+        
+        password.addEventListener('change', validatePasswords);
+        confirm.addEventListener('keyup', validatePasswords);
+        
+        // Bootstrap standard validation hook
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                validatePasswords();
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
+{% endblock %}
+

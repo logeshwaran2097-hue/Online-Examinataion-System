@@ -1,0 +1,71 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}My Profile - EduExam{% endblock %}
+
+{% block content %}
+<div class="row g-4 justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card card-premium p-4 text-center">
+            <!-- Profile Image / Upload -->
+            <div class="position-relative d-inline-block mx-auto mb-4" style="width: 120px; height: 120px;">
+                {% if student.profile_image %}
+                    <img src="{{ student.profile_image }}" class="rounded-circle border border-4 border-primary shadow-sm" style="width: 120px; height: 120px; object-fit: cover;" alt="Avatar">
+                {% else %}
+                    <div class="rounded-circle border border-4 border-primary bg-light d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                        <i class="fa-solid fa-user-graduate text-primary" style="font-size: 4rem;"></i>
+                    </div>
+                {% endif %}
+                
+                <!-- Edit Overlay -->
+                <form action="{{ url_for('student.upload_avatar') }}" method="POST" enctype="multipart/form-data" id="avatar-form" class="position-absolute bottom-0 end-0">
+                    <label for="profile_image" class="btn btn-primary btn-sm rounded-circle shadow-sm" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <i class="fa-solid fa-camera"></i>
+                    </label>
+                    <input type="file" id="profile_image" name="profile_image" accept="image/*" class="d-none" onchange="document.getElementById('avatar-form').submit();">
+                </form>
+            </div>
+
+            <!-- Verification Status Badge -->
+            <h3 class="fw-bold mb-1">{{ student.full_name }}</h3>
+            <p class="text-muted mb-3">{{ student.email }}</p>
+
+            <div class="mb-4">
+                {% if student.is_verified %}
+                    <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill"><i class="fa-solid fa-user-shield me-2"></i>Verified Student Account</span>
+                {% else %}
+                    <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill"><i class="fa-solid fa-triangle-exclamation me-2"></i>Pending Verification</span>
+                {% endif %}
+            </div>
+
+            <!-- Profile Fields Table -->
+            <div class="table-responsive text-start">
+                <table class="table table-borderless align-middle mb-4">
+                    <tbody>
+                        <tr class="border-bottom">
+                            <td class="text-muted fw-medium py-3" style="width: 40%;">Department</td>
+                            <td class="fw-semibold py-3">{{ student.department or 'Not Specified' }}</td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td class="text-muted fw-medium py-3">Year of Study</td>
+                            <td class="fw-semibold py-3">{% if student.year_of_study %}{{ student.year_of_study }}{{ 'st' if student.year_of_study == 1 else 'nd' if student.year_of_study == 2 else 'rd' if student.year_of_study == 3 else 'th' }} Year{% else %}Not Specified{% endif %}</td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td class="text-muted fw-medium py-3">Phone Number</td>
+                            <td class="fw-semibold py-3">{{ student.phone_number or 'Not Specified' }}</td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td class="text-muted fw-medium py-3">Registered On</td>
+                            <td class="fw-semibold py-3 text-muted small">{{ student.created_at.strftime('%B %d, %Y') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="{{ url_for('student.edit_profile') }}" class="btn btn-primary px-4 rounded-pill">Edit Details / Password</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Create Exam - EduExam{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'exams' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-semibold">New Examination</h1>
+            </div>
+            <a href="{{ url_for('admin.exams') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Exams
+            </a>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            <div class="card card-premium p-4 p-md-5 max-w-lg mx-auto" style="max-width: 680px;">
+                <div class="mb-4 text-center">
+                    <span class="fs-1 text-primary"><i class="fa-solid fa-file-signature"></i></span>
+                    <h2 class="h4 fw-bold mt-2">Create Exam Template</h2>
+                    <p class="text-muted small">Configure timing constraints, pass thresholds, and schedules.</p>
+                </div>
+
+                <form action="{{ url_for('admin.add_exam') }}" method="POST" class="needs-validation" novalidate>
+                    <div class="row">
+                        <!-- Title -->
+                        <div class="col-md-6 mb-3">
+                            <label for="exam_title" class="form-label small fw-medium">Exam Title</label>
+                            <input type="text" class="form-control" id="exam_title" name="exam_title" placeholder="Data Structures Midterm" required>
+                            <div class="invalid-feedback">Please enter an exam title.</div>
+                        </div>
+
+                        <!-- Subject -->
+                        <div class="col-md-6 mb-3">
+                            <label for="subject_name" class="form-label small fw-medium">Subject Name</label>
+                            <input type="text" class="form-control" id="subject_name" name="subject_name" placeholder="Computer Science" required>
+                            <div class="invalid-feedback">Please enter the subject name.</div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label small fw-medium">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Instructions, topics covered, policies..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <!-- Duration -->
+                        <div class="col-md-6 mb-3">
+                            <label for="duration_minutes" class="form-label small fw-medium">Duration (Minutes)</label>
+                            <input type="number" class="form-control" id="duration_minutes" name="duration_minutes" min="1" placeholder="60" required>
+                            <div class="invalid-feedback">Please enter a valid positive duration.</div>
+                        </div>
+
+                        <!-- Pass Mark -->
+                        <div class="col-md-6 mb-3">
+                            <label for="pass_mark" class="form-label small fw-medium">Pass Mark</label>
+                            <input type="number" class="form-control" id="pass_mark" name="pass_mark" min="0" placeholder="50" required>
+                            <div class="invalid-feedback">Please enter passing threshold marks.</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Date -->
+                        <div class="col-md-4 mb-3">
+                            <label for="exam_date" class="form-label small fw-medium">Exam Date</label>
+                            <input type="date" class="form-control" id="exam_date" name="exam_date" required>
+                            <div class="invalid-feedback">Please select a date.</div>
+                        </div>
+
+                        <!-- Start Time -->
+                        <div class="col-md-4 mb-3">
+                            <label for="start_time" class="form-label small fw-medium">Start Time</label>
+                            <input type="time" class="form-control" id="start_time" name="start_time" required>
+                            <div class="invalid-feedback">Start time required.</div>
+                        </div>
+
+                        <!-- End Time -->
+                        <div class="col-md-4 mb-4">
+                            <label for="end_time" class="form-label small fw-medium">End Time</label>
+                            <input type="time" class="form-control" id="end_time" name="end_time" required>
+                            <div class="invalid-feedback">End time required.</div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3 fw-semibold">Save Exam Template</button>
+                </form>
+            </div>
+        </main>
+
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Form validations
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Edit Profile - EduExam{% endblock %}
+
+{% block content %}
+<div class="row g-4 justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card card-premium p-4">
+            <h3 class="h5 fw-bold mb-4 text-center"><i class="fa-solid fa-user-pen me-2 text-primary"></i>Update Profile Details</h3>
+            
+            <form action="{{ url_for('student.edit_profile') }}" method="POST">
+                <!-- Name -->
+                <div class="mb-3">
+                    <label for="full_name" class="form-label small fw-semibold text-muted">Full Name <font color="red">*</font></label>
+                    <input type="text" class="form-control rounded-3" id="full_name" name="full_name" value="{{ student.full_name }}" required>
+                </div>
+
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label for="phone_number" class="form-label small fw-semibold text-muted">Phone Number</label>
+                    <input type="tel" class="form-control rounded-3" id="phone_number" name="phone_number" value="{{ student.phone_number or '' }}" placeholder="e.g. +1234567890">
+                </div>
+
+                <hr class="my-4 text-muted">
+                
+                <h4 class="h6 fw-bold mb-3"><i class="fa-solid fa-key me-2 text-warning"></i>Change Password (Optional)</h4>
+                <p class="text-muted small">Leave password fields blank if you do not wish to update your login credentials.</p>
+
+                <!-- New Password -->
+                <div class="mb-3 position-relative">
+                    <label for="new_password" class="form-label small fw-semibold text-muted">New Password</label>
+                    <input type="password" class="form-control rounded-3 pr-5" id="new_password" name="new_password">
+                    <button class="btn btn-link text-reset position-absolute end-0 top-50 translate-middle-y password-toggle mt-3" type="button" data-target="new_password" style="z-index: 10;">
+                        <i class="fa-solid fa-eye text-muted"></i>
+                    </button>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-4 position-relative">
+                    <label for="confirm_password" class="form-label small fw-semibold text-muted">Confirm New Password</label>
+                    <input type="password" class="form-control rounded-3 pr-5" id="confirm_password" name="confirm_password">
+                    <button class="btn btn-link text-reset position-absolute end-0 top-50 translate-middle-y password-toggle mt-3" type="button" data-target="confirm_password" style="z-index: 10;">
+                        <i class="fa-solid fa-eye text-muted"></i>
+                    </button>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-3 justify-content-end">
+                    <a href="{{ url_for('student.profile') }}" class="btn btn-outline-secondary px-4 rounded-pill">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-4 rounded-pill">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

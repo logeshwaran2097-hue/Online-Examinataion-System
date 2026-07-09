@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}System Audit Logs - EduExam{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'activity_logs' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-semibold">Security Audit Trail</h1>
+            </div>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            <!-- Filtering Log -->
+            <div class="card card-premium p-4 mb-4">
+                <form method="GET" action="{{ url_for('admin.activity_logs') }}" class="row g-3">
+                    <div class="col-md-9">
+                        <label for="role" class="form-label small fw-medium text-muted">Filter by Actor Role</label>
+                        <select class="form-select" id="role" name="role" onchange="this.form.submit()">
+                            <option value="">All Actors (Global Activity Log)</option>
+                            <option value="admin" {% if selected_role == 'admin' %}selected{% endif %}>Administrators Only</option>
+                            <option value="student" {% if selected_role == 'student' %}selected{% endif %}>Students Only</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-outline-secondary w-100 py-2"><i class="fa-solid fa-sync me-1"></i> Refresh Logs</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Activity Logs list -->
+            <div class="card card-premium p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h6 fw-bold mb-0"><i class="fa-solid fa-clock-rotate-left me-1 text-primary"></i>Audit Log Ledger</h3>
+                    <span class="badge bg-primary rounded-pill px-2.5">{{ logs|length }} Logs</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="small text-muted">
+                                <th>Timestamp</th>
+                                <th>Actor ID</th>
+                                <th>Role</th>
+                                <th>Activity Log Description</th>
+                                <th>IP Address</th>
+                                <th>Browser / Agent</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small">
+                            {% for log in logs %}
+                            <tr class="{% if 'lockout' in log.activity.lower() or 'locked' in log.activity.lower() or 'delete' in log.activity.lower() %}table-warning bg-opacity-10{% endif %}">
+                                <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td class="fw-semibold">
+                                    {% if log.user_id %}
+                                    ID: {{ log.user_id }}
+                                    {% else %}
+                                    Anonymous
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge {% if log.user_role == 'admin' %}bg-info text-dark{% else %}bg-secondary{% endif %} rounded-pill px-2.5">
+                                        {{ log.user_role|upper }}
+                                    </span>
+                                </td>
+                                <td class="fw-medium">{{ log.activity }}</td>
+                                <td><code>{{ log.ip_address }}</code></td>
+                                <td class="text-muted small" title="{{ log.browser or 'N/A' }}">{{ log.browser[:40] if log.browser else 'N/A' }}{% if log.browser and log.browser|length > 40 %}...{% endif %}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">No system audit logs found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}

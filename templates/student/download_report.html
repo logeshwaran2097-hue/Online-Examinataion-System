@@ -1,0 +1,60 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Export Centre - EduExam{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <!-- Header -->
+        <div class="card card-premium p-4 mb-4">
+            <h2 class="h4 fw-bold mb-1"><i class="fa-solid fa-download text-primary me-2"></i>Academic Reports Export Centre</h2>
+            <p class="text-muted small mb-0">Select a file format to export and archive your assessment history and grades.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Excel Export Card -->
+            <div class="col-sm-6">
+                <div class="card card-premium p-4 h-100 text-center d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                            <i class="fa-solid fa-file-excel fs-3"></i>
+                        </div>
+                        <h4 class="h6 fw-bold text-body mb-2">Excel Sheet Export</h4>
+                        <p class="text-muted small mb-4">Download a structured Microsoft Excel workbook (.xlsx) including subjects, marks, percentage, and grade sheets.</p>
+                    </div>
+                    <div class="d-grid">
+                        <a href="{{ url_for('result.export_excel') }}" class="btn btn-success rounded-pill btn-sm {% if results_count == 0 %}disabled{% endif %}">
+                            <i class="fa-solid fa-download me-2"></i>Download .xlsx
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CSV Export Card -->
+            <div class="col-sm-6">
+                <div class="card card-premium p-4 h-100 text-center d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="rounded-circle bg-info-subtle text-info d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                            <i class="fa-solid fa-file-csv fs-3"></i>
+                        </div>
+                        <h4 class="h6 fw-bold text-body mb-2">CSV Table Export</h4>
+                        <p class="text-muted small mb-4">Download a comma-separated values (.csv) list sheet suitable for import into other spreadsheet or database managers.</p>
+                    </div>
+                    <div class="d-grid">
+                        <a href="{{ url_for('result.export_csv') }}" class="btn btn-info text-white rounded-pill btn-sm {% if results_count == 0 %}disabled{% endif %}">
+                            <i class="fa-solid fa-download me-2"></i>Download .csv
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footnote details -->
+        <div class="card card-premium p-4 mt-4 text-muted small">
+            <h5 class="h6 fw-bold text-body mb-2"><i class="fa-solid fa-circle-question me-1 text-primary"></i>Frequently Asked Questions</h5>
+            <p class="mb-2"><b>How do I print individual exam sheets?</b><br/>Go back to the <a href="{{ url_for('result.results_list') }}">My Results</a> tab, find the particular row, and click the <b>PDF</b> download link.</p>
+            <p class="mb-0"><b>Are certificate files included in the spreadsheet?</b><br/>Spreadsheets contain metadata transcripts including scores, grades, and passing statuses, but do not contain PDF binary signatures. Certificate PDFs are separately fetched on the credentials page.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

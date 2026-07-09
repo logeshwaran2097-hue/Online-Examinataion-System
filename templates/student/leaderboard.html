@@ -1,0 +1,143 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Leaderboard Standings - EduExam{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <!-- Header / Standing info -->
+    <div class="col-12">
+        <div class="card card-premium p-4 d-flex flex-sm-row flex-column justify-content-between align-items-sm-center gap-3">
+            <div>
+                <h3 class="h4 mb-1 fw-bold"><i class="fa-solid fa-trophy text-warning me-2"></i>Global & Class Rankings</h3>
+                <p class="text-muted small mb-0">See how your scoring aggregates align with peers across the platform.</p>
+            </div>
+            {% if student_rank != 'N/A' %}
+            <div class="bg-primary-subtle text-primary border border-primary-subtle rounded-3 p-3 text-center">
+                <span class="text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">Your Standings</span>
+                <h4 class="fw-bold mb-0">Rank #{{ student_rank }}</h4>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Double Tab panels -->
+<div class="card card-premium p-4">
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs nav-fill mb-4" id="leaderboardTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold small" id="global-tab" data-bs-toggle="tab" data-bs-target="#global-panel" type="button" role="tab" aria-controls="global-panel" aria-selected="true">
+                <i class="fa-solid fa-earth-americas me-2"></i>Global Standings
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold small" id="dept-tab" data-bs-toggle="tab" data-bs-target="#dept-panel" type="button" role="tab" aria-controls="dept-panel" aria-selected="false">
+                <i class="fa-solid fa-building-columns me-2"></i>{{ current_user.department or 'Department' }} Class
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="leaderboardTabsContent">
+        <!-- Global Rankings -->
+        <div class="tab-pane fade show active" id="global-panel" role="tabpanel" aria-labelledby="global-tab">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" style="width: 10%;">Rank</th>
+                            <th scope="col" class="text-start">Student Name</th>
+                            <th scope="col">Department</th>
+                            <th scope="col">Aggregate Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if leaderboard %}
+                            {% for row in leaderboard %}
+                                <tr {% if row.name == current_user.full_name %}class="table-primary fw-bold"{% endif %}>
+                                    <td>
+                                        {% if row.rank == 1 %}
+                                            <span class="fs-5 text-warning"><i class="fa-solid fa-crown"></i> 1</span>
+                                        {% elif row.rank == 2 %}
+                                            <span class="fs-6 text-secondary"><i class="fa-solid fa-medal"></i> 2</span>
+                                        {% elif row.rank == 3 %}
+                                            <span class="fs-6 text-danger-emphasis"><i class="fa-solid fa-medal"></i> 3</span>
+                                        {% else %}
+                                            <span class="text-muted">{{ row.rank }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-start">
+                                        <i class="fa-solid fa-circle-user text-muted fs-5 me-2 align-middle"></i>
+                                        <span class="align-middle">{{ row.name }}</span>
+                                    </td>
+                                    <td>{{ row.department }}</td>
+                                    <td class="text-primary fw-bold">{{ row.score }} pts</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-trophy fs-1 mb-3 text-secondary d-block"></i>
+                                    No rankings calculated yet.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Department Rankings -->
+        <div class="tab-pane fade" id="dept-panel" role="tabpanel" aria-labelledby="dept-tab">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" style="width: 10%;">Rank</th>
+                            <th scope="col" class="text-start">Student Name</th>
+                            <th scope="col">Aggregate Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set dept_rank = 1 %}
+                        {% set ns = namespace(found=false) %}
+                        {% for row in leaderboard %}
+                            {% if row.department == current_user.department %}
+                                {% set ns.found = true %}
+                                <tr {% if row.name == current_user.full_name %}class="table-primary fw-bold"{% endif %}>
+                                    <td>
+                                        {% if dept_rank == 1 %}
+                                            <span class="fs-5 text-warning"><i class="fa-solid fa-crown"></i> 1</span>
+                                        {% elif dept_rank == 2 %}
+                                            <span class="fs-6 text-secondary"><i class="fa-solid fa-medal"></i> 2</span>
+                                        {% elif dept_rank == 3 %}
+                                            <span class="fs-6 text-danger-emphasis"><i class="fa-solid fa-medal"></i> 3</span>
+                                        {% else %}
+                                            <span class="text-muted">{{ dept_rank }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-start">
+                                        <i class="fa-solid fa-circle-user text-muted fs-5 me-2 align-middle"></i>
+                                        <span class="align-middle">{{ row.name }}</span>
+                                    </td>
+                                    <td class="text-primary fw-bold">{{ row.score }} pts</td>
+                                </tr>
+                                {% set dept_rank = dept_rank + 1 %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if not ns.found %}
+                            <tr>
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-trophy fs-1 mb-3 text-secondary d-block"></i>
+                                    No rankings recorded for this department yet.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

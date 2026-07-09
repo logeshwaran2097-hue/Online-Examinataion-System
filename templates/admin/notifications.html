@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Notifications - EduExam{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'notifications' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-semibold">Alerts & Notifications</h1>
+            </div>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 small py-2 px-3 mb-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="row g-4">
+                <!-- Publish Notification -->
+                <div class="col-lg-5">
+                    <div class="card card-premium p-4">
+                        <h3 class="h6 fw-bold mb-3"><i class="fa-solid fa-paper-plane me-1 text-primary"></i>Send Notification</h3>
+                        
+                        <form action="{{ url_for('admin.notifications') }}" method="POST" class="needs-validation" novalidate>
+                            <!-- Recipient -->
+                            <div class="mb-3">
+                                <label for="user_id" class="form-label small text-muted">Recipient Target</label>
+                                <select class="form-select small" id="user_id" name="user_id">
+                                    <option value="" selected>Broadcast to All Students</option>
+                                    {% for s in students %}
+                                    <option value="{{ s.id }}">{{ s.full_name }} ({{ s.email }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Notification Type -->
+                            <div class="mb-3">
+                                <label for="notification_type" class="form-label small text-muted">Category Type</label>
+                                <select class="form-select small" id="notification_type" name="notification_type" required>
+                                    <option value="system" selected>System Alert</option>
+                                    <option value="exam">Exam Reminder</option>
+                                    <option value="result">Result Announcement</option>
+                                    <option value="security">Security Alert</option>
+                                </select>
+                            </div>
+
+                            <!-- Title -->
+                            <div class="mb-3">
+                                <label for="title" class="form-label small text-muted">Notification Title</label>
+                                <input type="text" class="form-control form-control-sm" id="title" name="title" placeholder="Important announcement title" required>
+                                <div class="invalid-feedback">Title is required.</div>
+                            </div>
+
+                            <!-- Message -->
+                            <div class="mb-3">
+                                <label for="message" class="form-label small text-muted">Alert Message</label>
+                                <textarea class="form-control form-control-sm" id="message" name="message" rows="4" placeholder="Type notification details here..." required></textarea>
+                                <div class="invalid-feedback">Message body is required.</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 py-2 small fw-semibold"><i class="fa-solid fa-bullhorn me-1"></i> Send Announcement</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Notifications log -->
+                <div class="col-lg-7">
+                    <div class="card card-premium p-4">
+                        <h3 class="h6 fw-bold mb-3"><i class="fa-solid fa-clock me-1 text-muted"></i>Sent Notification History</h3>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr class="small text-muted">
+                                        <th>Date</th>
+                                        <th>Target User ID</th>
+                                        <th>Category</th>
+                                        <th>Title & Message</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="small">
+                                    {% for n in notifications %}
+                                    <tr>
+                                        <td>{{ n.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td class="fw-semibold">
+                                            {% if n.user_id %}
+                                            ID: {{ n.user_id }}
+                                            {% else %}
+                                            Broadcast
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if n.notification_type == 'exam' %}bg-info{% elif n.notification_type == 'result' %}bg-success{% elif n.notification_type == 'security' %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill px-2 py-0.5 small">
+                                                {{ n.notification_type|upper }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold">{{ n.title }}</div>
+                                            <div class="text-muted small">{{ n.message }}</div>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">No notifications have been sent yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Bootstrap standard validation hook
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
+{% endblock %}

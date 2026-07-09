@@ -1,0 +1,559 @@
+{% extends "base.html" %}
+
+{% block title %}Taking Exam - {{ exam.exam_title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Full-screen focus mode stylesheet overrides */
+    body {
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+    .exam-wrapper {
+        min-height: 100vh;
+        background-color: var(--bg-main);
+        display: flex;
+        flex-direction: column;
+    }
+    .exam-header {
+        height: 70px;
+        background-color: var(--bg-card);
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .exam-body {
+        flex: 1;
+        display: flex;
+        min-width: 0;
+        height: calc(100vh - 70px);
+    }
+    .exam-main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 30px;
+    }
+    .exam-sidebar {
+        width: 320px;
+        border-left: 1px solid var(--border-color);
+        background-color: var(--bg-card);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow-y: auto;
+    }
+    
+    /* Option selector override */
+    .option-card {
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .option-card:hover {
+        border-color: var(--primary-color);
+        background-color: var(--primary-light);
+    }
+    .option-card.selected {
+        border-color: var(--primary-color);
+        background-color: var(--primary-light);
+    }
+    .option-index {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        background-color: var(--bg-main);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    .option-card.selected .option-index {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    /* Palette Grid Status Colors:
+       Blue   = Current Question
+       Green  = Answered
+       Yellow = Marked for Review
+       Red    = Visited but Unanswered
+       Gray   = Not Visited
+    */
+    .palette-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+    .palette-btn {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        border: 1px solid transparent;
+    }
+    
+    /* Status classes */
+    .q-current {
+        background-color: #3b82f6 !important; /* Blue */
+        color: white !important;
+        border: 2px solid #1d4ed8 !important;
+    }
+    .q-answered {
+        background-color: #10b981 !important; /* Green */
+        color: white !important;
+    }
+    .q-marked {
+        background-color: #f59e0b !important; /* Yellow */
+        color: white !important;
+    }
+    .q-unanswered {
+        background-color: #ef4444 !important; /* Red */
+        color: white !important;
+    }
+    .q-not-visited {
+        background-color: #94a3b8 !important; /* Gray */
+        color: white !important;
+    }
+
+    #webcam-preview {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 100px;
+        height: 75px;
+        border-radius: 6px;
+        border: 2px solid var(--border-color);
+        z-index: 100;
+        background-color: #000;
+        transform: scaleX(-1); /* mirror */
+        object-fit: cover;
+    }
+</style>
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="exam-wrapper">
+    <!-- Header -->
+    <header class="exam-header px-4 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+            <span class="fs-4 fw-bold text-primary"><i class="fa-solid fa-graduation-cap me-2"></i>EduExam</span>
+            <div class="vr d-none d-sm-block" style="height: 30px;"></div>
+            <h1 class="h5 mb-0 fw-bold d-none d-sm-block text-body">{{ exam.exam_title }}</h1>
+        </div>
+        
+        <!-- Timer -->
+        <div class="d-flex align-items-center gap-3">
+            <div class="timer-pill" id="exam-timer-wrapper">
+                <i class="fa-solid fa-clock"></i>
+                <span id="countdown-timer">--:--</span>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Body -->
+    <div class="exam-body">
+        <div class="exam-main">
+            <!-- Question Content Card -->
+            <div class="card card-premium p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted small fw-semibold">Question {{ current_index + 1 }} of {{ total_questions }}</span>
+                    <div>
+                        <span class="badge bg-primary-subtle text-primary px-3 py-1.5 rounded-pill me-2">Section: {{ question.difficulty_level|upper }}</span>
+                        <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill">{{ question.marks }} Mark{% if question.marks > 1 %}s{% endif %}</span>
+                    </div>
+                </div>
+                
+                <h2 class="h5 fw-bold mb-4 text-body">{{ question.question_text }}</h2>
+                
+                <!-- Options list (Div Cards) -->
+                <div class="d-flex flex-column gap-3 mb-4 question-block">
+                    {% if question.options %}
+                        {% set opt = question.options %}
+                        
+                        <!-- Option A -->
+                        {% if opt.option_a %}
+                        <div class="option-card p-3 d-flex align-items-center gap-3 {% if selected_option == 'A' %}selected{% endif %}" onclick="selectOption('A')">
+                            <input type="radio" name="option" value="A" class="d-none" {% if selected_option == 'A' %}checked{% endif %}>
+                            <div class="option-index">A</div>
+                            <div class="text-body fw-medium">{{ opt.option_a }}</div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Option B -->
+                        {% if opt.option_b %}
+                        <div class="option-card p-3 d-flex align-items-center gap-3 {% if selected_option == 'B' %}selected{% endif %}" onclick="selectOption('B')">
+                            <input type="radio" name="option" value="B" class="d-none" {% if selected_option == 'B' %}checked{% endif %}>
+                            <div class="option-index">B</div>
+                            <div class="text-body fw-medium">{{ opt.option_b }}</div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Option C -->
+                        {% if opt.option_c %}
+                        <div class="option-card p-3 d-flex align-items-center gap-3 {% if selected_option == 'C' %}selected{% endif %}" onclick="selectOption('C')">
+                            <input type="radio" name="option" value="C" class="d-none" {% if selected_option == 'C' %}checked{% endif %}>
+                            <div class="option-index">C</div>
+                            <div class="text-body fw-medium">{{ opt.option_c }}</div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Option D -->
+                        {% if opt.option_d %}
+                        <div class="option-card p-3 d-flex align-items-center gap-3 {% if selected_option == 'D' %}selected{% endif %}" onclick="selectOption('D')">
+                            <input type="radio" name="option" value="D" class="d-none" {% if selected_option == 'D' %}checked{% endif %}>
+                            <div class="option-index">D</div>
+                            <div class="text-body fw-medium">{{ opt.option_d }}</div>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-danger small">No options found for this question.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Question Actions Footer -->
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex gap-2">
+                    {% if current_index > 0 %}
+                        <a href="{{ url_for('exam.take_exam_view', exam_id=exam.id, q=current_index - 1) }}" class="btn btn-outline-secondary px-4 rounded-pill"><i class="fa-solid fa-arrow-left me-2"></i>Previous</a>
+                    {% else %}
+                        <button class="btn btn-outline-secondary px-4 rounded-pill" disabled><i class="fa-solid fa-arrow-left me-2"></i>Previous</button>
+                    {% endif %}
+                    
+                    <button class="btn btn-outline-danger px-3 rounded-pill" onclick="clearResponse();"><i class="fa-solid fa-eraser me-1"></i>Clear</button>
+                </div>
+                
+                <div>
+                    <button class="btn {% if question.id in flags %}btn-warning text-white{% else %}btn-outline-warning{% endif %} px-4 rounded-pill" onclick="toggleFlagReview()">
+                        <i class="fa-solid fa-flag me-2"></i>{% if question.id in flags %}Unmark Review{% else %}Mark for Review{% endif %}
+                    </button>
+                </div>
+                
+                <div>
+                    {% if current_index < total_questions - 1 %}
+                        <a href="{{ url_for('exam.take_exam_view', exam_id=exam.id, q=current_index + 1) }}" class="btn btn-primary px-4 rounded-pill">Next<i class="fa-solid fa-arrow-right ms-2"></i></a>
+                    {% else %}
+                        <a href="{{ url_for('exam.review_questions', exam_id=exam.id) }}" class="btn btn-success px-4 rounded-pill">Finish Attempt<i class="fa-solid fa-check ms-2"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Sidebar panel -->
+        <aside class="exam-sidebar d-none d-md-flex">
+            <div>
+                <h3 class="h6 fw-bold mb-3 text-uppercase text-muted" style="letter-spacing: 0.5px;">Navigation Grid</h3>
+                <div class="palette-grid mb-4">
+                    {% for q_id in question_ids %}
+                        {% set q_idx = loop.index0 %}
+                        
+                        {# Setup dynamic palette color status classes #}
+                        {% set status_class = 'q-not-visited' %}
+                        
+                        {% if q_idx == current_index %}
+                            {% set status_class = 'q-current' %}
+                        {% elif q_id in flags %}
+                            {% set status_class = 'q-marked' %}
+                        {% elif q_id in saved_map %}
+                            {% set status_class = 'q-answered' %}
+                        {% elif q_id in session.get('exam_' ~ exam.id ~ '_visited', []) %}
+                            {% set status_class = 'q-unanswered' %}
+                        {% endif %}
+                        
+                        <a href="{{ url_for('exam.take_exam_view', exam_id=exam.id, q=q_idx) }}" 
+                           class="palette-btn {{ status_class }}" 
+                           id="palette-btn-{{ q_id }}">
+                            {{ loop.index }}
+                        </a>
+                    {% endfor %}
+                </div>
+                
+                <!-- Status guides -->
+                <div class="d-flex flex-column gap-2 small border-top border-light-subtle pt-3 text-muted">
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width: 12px; height: 12px; background-color: #3b82f6; border-radius: 3px;"></div>
+                        <span>Current</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width: 12px; height: 12px; background-color: #10b981; border-radius: 3px;"></div>
+                        <span>Answered</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width: 12px; height: 12px; background-color: #f59e0b; border-radius: 3px;"></div>
+                        <span>Marked for Review</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width: 12px; height: 12px; background-color: #ef4444; border-radius: 3px;"></div>
+                        <span>Unanswered</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width: 12px; height: 12px; background-color: #94a3b8; border-radius: 3px;"></div>
+                        <span>Not Visited</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid mt-4">
+                <a href="{{ url_for('exam.review_questions', exam_id=exam.id) }}" class="btn btn-danger py-2.5 rounded-3 fw-bold"><i class="fa-solid fa-circle-check me-2"></i>Review & Submit</a>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- Webcam elements for background capturing -->
+<video id="proctor-video" autoplay playsinline style="display: none;"></video>
+<canvas id="proctor-canvas" style="display: none;" width="320" height="240"></canvas>
+<!-- Miniature visual feedback helper in corner -->
+<video id="webcam-preview" autoplay playsinline muted></video>
+{% endblock %}
+
+{% block extra_js %}
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const EXAM_ID = {{ exam.id }};
+    const QUESTION_ID = {{ question.id }};
+    const TIME_LEFT = {{ time_left }};
+    
+    // Register visited state
+    let visitedList = JSON.parse(sessionStorage.getItem(`exam_${EXAM_ID}_visited`) || '[]');
+    if (!visitedList.includes(QUESTION_ID)) {
+        visitedList.push(QUESTION_ID);
+        sessionStorage.setItem(`exam_${EXAM_ID}_visited`, JSON.stringify(visitedList));
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        
+        // 1. Countdown timer
+        startCountdownTimer(TIME_LEFT, 'countdown-timer', () => {
+            Swal.fire({
+                title: 'Time Expired!',
+                text: 'Your time is up. Your answers will be automatically submitted.',
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                allowOutsideClick: false
+            }).then(() => {
+                window.location.href = `/exam/submit/${EXAM_ID}?auto=1`;
+            });
+        });
+        
+        // 2. Anti-Cheating: Detect focus loss (tab switch)
+        window.addEventListener('blur', () => {
+            logTabSwitch();
+        });
+        
+        // 3. Security restrictions: Disable right-click & copy/paste
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+        document.addEventListener('copy', (e) => e.preventDefault());
+        document.addEventListener('cut', (e) => e.preventDefault());
+        document.addEventListener('paste', (e) => e.preventDefault());
+        
+        // 4. Force Fullscreen Checks
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                Swal.fire({
+                    title: 'Security Violation!',
+                    text: 'Exiting fullscreen is prohibited during active exams. Please enter fullscreen again to continue.',
+                    icon: 'warning',
+                    confirmButtonText: 'Re-enter Fullscreen',
+                    allowOutsideClick: false
+                }).then(() => {
+                    requestFullscreenMode();
+                });
+            }
+        });
+        
+        // 5. Initialize Proctoring Webcam capturing
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                document.getElementById('proctor-video').srcObject = stream;
+                document.getElementById('webcam-preview').srcObject = stream;
+                
+                // Trigger snapshots uploads every 30 seconds
+                setInterval(captureProctorSnapshot, 30000);
+            })
+            .catch(err => {
+                console.error("Camera proctor initialization failed: ", err);
+                Swal.fire({
+                    title: 'System Alert!',
+                    text: 'Webcam feed disconnected. Active camera proctor is required to prevent revocation.',
+                    icon: 'error',
+                    confirmButtonText: 'Retry Connection'
+                });
+            });
+    });
+
+    function requestFullscreenMode() {
+        const docEl = document.documentElement;
+        const requestFS = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+        if (requestFS) requestFS.call(docEl);
+    }
+
+    /**
+     * Handle option selection changes & auto-saves via AJAX
+     */
+    function selectOption(optLetter) {
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        const selectedCard = event.currentTarget;
+        selectedCard.classList.add('selected');
+        const activeRadio = selectedCard.querySelector('input[type="radio"]');
+        if (activeRadio) activeRadio.checked = true;
+        
+        // Save
+        saveAnswer(optLetter);
+    }
+    
+    function clearResponse() {
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.classList.remove('selected');
+            const radio = card.querySelector('input[type="radio"]');
+            if (radio) radio.checked = false;
+        });
+        
+        saveAnswer('');
+    }
+    
+    function saveAnswer(optLetter) {
+        const formData = new FormData();
+        formData.append('exam_id', EXAM_ID);
+        formData.append('question_id', QUESTION_ID);
+        formData.append('selected_answer', optLetter);
+        
+        fetch('/exam/save-answer', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const btn = document.getElementById(`palette-btn-${QUESTION_ID}`);
+                if (btn && !btn.classList.contains('q-current')) {
+                    if (optLetter) {
+                        btn.className = "palette-btn q-answered";
+                    } else {
+                        btn.className = "palette-btn q-unanswered";
+                    }
+                }
+            }
+        })
+        .catch(err => console.error("Error auto-saving response: ", err));
+    }
+
+    /**
+     * Toggle Mark for Review flag status
+     */
+    function toggleFlagReview() {
+        const formData = new FormData();
+        formData.append('exam_id', EXAM_ID);
+        formData.append('question_id', QUESTION_ID);
+        
+        fetch('/exam/toggle-flag', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const btn = document.getElementById(`palette-btn-${QUESTION_ID}`);
+                const actionBtn = event.currentTarget;
+                if (data.flagged) {
+                    if (btn) btn.className = "palette-btn q-marked";
+                    actionBtn.className = "btn btn-warning text-white px-4 rounded-pill";
+                    actionBtn.innerHTML = '<i class="fa-solid fa-flag me-2"></i>Unmark Review';
+                } else {
+                    const isAnswered = document.querySelector('.option-card.selected') !== null;
+                    if (btn) {
+                        btn.className = isAnswered ? "palette-btn q-answered" : "palette-btn q-unanswered";
+                    }
+                    actionBtn.className = "btn btn-outline-warning px-4 rounded-pill";
+                    actionBtn.innerHTML = '<i class="fa-solid fa-flag me-2"></i>Mark for Review';
+                }
+            }
+        })
+        .catch(err => console.error("Error toggling review flag: ", err));
+    }
+
+    /**
+     * Log proctor tab switches
+     */
+    function logTabSwitch() {
+        const formData = new FormData();
+        formData.append('exam_id', EXAM_ID);
+        
+        fetch('/exam/monitor/tab-switch', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.auto_submit) {
+                    Swal.fire({
+                        title: 'Auto Submission Triggered!',
+                        text: 'Exceeded maximum allowable focus warnings. Initiating automatic submission.',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        allowOutsideClick: false
+                    }).then(() => {
+                        window.location.href = `/exam/submit/${EXAM_ID}?auto=1`;
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Focus Alert!',
+                        text: `Tab-switch detected! Exceeding warnings will result in auto-submission. (Warnings: ${data.switches}/3)`,
+                        icon: 'warning',
+                        confirmButtonText: 'Return to Exam',
+                        allowOutsideClick: false
+                    });
+                }
+            }
+        })
+        .catch(err => console.error("Error proctoring tab: ", err));
+    }
+
+    /**
+     * Capture & Upload Webcam snapshot
+     */
+    function captureProctorSnapshot() {
+        const videoEl = document.getElementById('proctor-video');
+        const canvasEl = document.getElementById('proctor-canvas');
+        if (!videoEl || !canvasEl || !videoEl.srcObject) return;
+        
+        const ctx = canvasEl.getContext('2d');
+        ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+        const dataUrl = canvasEl.toDataURL('image/png');
+        
+        const formData = new FormData();
+        formData.append('exam_id', EXAM_ID);
+        formData.append('image_data', dataUrl);
+        
+        fetch('/exam/monitor/webcam', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                console.warn("Failed to upload proctor screenshot: ", data.message);
+            }
+        })
+        .catch(err => console.error("Error uploading webcam frame: ", err));
+    }
+</script>
+{% endblock %}

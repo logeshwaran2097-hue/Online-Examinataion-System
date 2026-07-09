@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - EduExam{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    <!-- Sidebar Include -->
+    {% set active_page = 'dashboard' %}
+    {% include "admin/sidebar.html" %}
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <!-- Top Navbar -->
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <span class="fw-semibold small d-none d-sm-inline">System Admin Dashboard</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <a href="#" id="theme-toggle" class="btn btn-link text-reset p-2">
+                    <i class="fa-solid fa-moon fs-5"></i>
+                </a>
+                <span class="badge bg-info text-dark px-3 py-1.5 rounded-pill fw-semibold">Global Admin</span>
+            </div>
+        </header>
+
+        <!-- Main Body -->
+        <main class="flex-grow-1 p-4 animate-fade-in">
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 small py-2 px-3 mb-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.75rem 1rem;"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Stats Grid -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card card-premium p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small fw-semibold">Total Students</span>
+                            <span class="fs-4 text-primary"><i class="fa-solid fa-users"></i></span>
+                        </div>
+                        <h2 class="fw-bold mb-1">{{ stats.total_students }}</h2>
+                        <span class="text-success small">Registered student body</span>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card card-premium p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small fw-semibold">Active Exams</span>
+                            <span class="fs-4 text-info"><i class="fa-solid fa-hourglass-half"></i></span>
+                        </div>
+                        <h2 class="fw-bold mb-1">{{ stats.active_exams }}</h2>
+                        <span class="text-muted small">Live testing sessions</span>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card card-premium p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small fw-semibold">Assessments Completed</span>
+                            <span class="fs-4 text-success"><i class="fa-solid fa-circle-check"></i></span>
+                        </div>
+                        <h2 class="fw-bold mb-1">{{ stats.completed_exams }}</h2>
+                        <span class="text-muted small">Completed exam templates</span>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card card-premium p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small fw-semibold">Average Pass Rate</span>
+                            <span class="fs-4 text-warning"><i class="fa-solid fa-gauge-high"></i></span>
+                        </div>
+                        <h2 class="fw-bold mb-1" id="val-pass-rate">{{ stats.pass_rate }}</h2>
+                        <span class="text-muted small">Passing mark defined on exams</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Double Split Row -->
+            <div class="row g-4 mb-4">
+                <!-- Students Management List -->
+                <div class="col-lg-8">
+                    <div class="card card-premium p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 class="h5 mb-0">Recent Student Registrations</h3>
+                            <a href="{{ url_for('admin.students') }}" class="btn btn-primary btn-sm rounded-pill px-3"><i class="fa-solid fa-users me-1"></i> View All</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr class="small text-muted">
+                                        <th>Name</th>
+                                        <th>Department</th>
+                                        <th>Year</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="small">
+                                    {% for student in recent_students %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">{{ student.full_name }}</div>
+                                            <div class="text-muted small">{{ student.email }}</div>
+                                        </td>
+                                        <td>{{ student.department or 'N/A' }}</td>
+                                        <td>{{ student.year_of_study or 'N/A' }}</td>
+                                        <td>
+                                            {% if student.status %}
+                                            <span class="badge bg-success rounded-pill px-2 py-0.5">Active</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary rounded-pill px-2 py-0.5">Deactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ url_for('admin.student_profile', student_id=student.id) }}" class="btn btn-outline-secondary btn-sm rounded-3 py-1 px-2"><i class="fa-solid fa-eye"></i></a>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-3">No student registrations found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pass Rate Doughnut -->
+                <div class="col-lg-4">
+                    <div class="card card-premium p-4 h-100">
+                        <h3 class="h5 mb-4">Passing Rate Overview</h3>
+                        <div style="height: 200px;" class="position-relative">
+                            <canvas id="passRateChart"></canvas>
+                        </div>
+                        <div class="d-flex justify-content-around mt-3 text-center small">
+                            <div>
+                                <span class="fw-bold text-success">Pass</span>
+                                <div id="pct-pass">0%</div>
+                            </div>
+                            <div>
+                                <span class="fw-bold text-danger">Fail</span>
+                                <div id="pct-fail">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Split Row (Activities and Logs) -->
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card card-premium p-4">
+                        <h3 class="h5 mb-3">Live System Log Activity</h3>
+                        <div class="d-flex flex-column gap-3 small">
+                            {% for act in recent_activities %}
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2">
+                                <div>
+                                    <span class="fw-semibold text-primary">ID: {{ act.user_id or 'System' }}</span>
+                                    <span class="text-muted"> - {{ act.activity }}</span>
+                                </div>
+                                <span class="text-muted small">{{ act.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                            </div>
+                            {% else %}
+                            <div class="text-center text-muted py-2">No activity logs recorded.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card card-premium p-4">
+                        <h3 class="h5 mb-3">Quick Controls</h3>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ url_for('admin.add_exam') }}" class="btn btn-outline-primary rounded-pill"><i class="fa-solid fa-file-signature me-1"></i> New Exam Template</a>
+                            <a href="{{ url_for('admin.export_results_excel') }}" class="btn btn-outline-info rounded-pill"><i class="fa-solid fa-file-excel me-1"></i> Export Results (Excel)</a>
+                            <a href="{{ url_for('admin.notifications') }}" class="btn btn-outline-secondary rounded-pill"><i class="fa-solid fa-envelope me-1"></i> Send Announcement</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Doughnut Chart for pass rate
+        const passRateEl = document.getElementById('val-pass-rate');
+        let passRateVal = 0.0;
+        if (passRateEl) {
+            passRateVal = parseFloat(passRateEl.textContent.replace('%', ''));
+        }
+        if (isNaN(passRateVal)) passRateVal = 0.0;
+        
+        let failRateVal = 100.0 - passRateVal;
+        if (passRateVal === 0.0 && failRateVal === 100.0) {
+            // If no data is available
+            passRateVal = 0;
+            failRateVal = 0;
+        }
+
+        document.getElementById('pct-pass').textContent = passRateVal.toFixed(1) + '%';
+        document.getElementById('pct-fail').textContent = failRateVal.toFixed(1) + '%';
+
+        const ctx = document.getElementById('passRateChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pass', 'Fail'],
+                    datasets: [{
+                        data: [passRateVal, failRateVal],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

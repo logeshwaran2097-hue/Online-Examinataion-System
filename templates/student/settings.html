@@ -1,0 +1,115 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Account Settings - EduExam{% endblock %}
+
+{% block content %}
+<div class="row g-4 justify-content-center">
+    <div class="col-md-9 col-lg-8">
+        <div class="card card-premium p-4">
+            <h3 class="h5 fw-bold mb-4 text-center border-bottom pb-3"><i class="fa-solid fa-sliders text-primary me-2"></i>Preferences & Settings</h3>
+            
+            <form action="{{ url_for('student.settings') }}" method="POST">
+                <!-- Theme Preferences -->
+                <div class="mb-4">
+                    <h4 class="h6 fw-bold mb-3 text-uppercase text-muted" style="letter-spacing: 0.5px;">Theme preferences</h4>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="p-3 border rounded-3 bg-light-subtle d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="fw-semibold small">Visual Interface Mode</div>
+                                    <div class="text-muted small" style="font-size: 0.75rem;">Switch between light and dark modes.</div>
+                                </div>
+                                <div class="form-check form-switch fs-5">
+                                    <!-- This switch triggers same functionality as theme-toggle in top bar -->
+                                    <input class="form-check-input cursor-pointer" type="checkbox" id="settings-theme-switch">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="mb-4">
+                    <h4 class="h6 fw-bold mb-3 text-uppercase text-muted" style="letter-spacing: 0.5px;">Notification Alerts</h4>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="p-3 border rounded-3 bg-light-subtle d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="fw-semibold small">Email Exam Reminders</div>
+                                <div class="text-muted small" style="font-size: 0.75rem;">Receive emails 24 hours prior to scheduled exam start times.</div>
+                            </div>
+                            <div class="form-check form-switch fs-5">
+                                <input class="form-check-input cursor-pointer" type="checkbox" id="email-reminders" checked>
+                            </div>
+                        </div>
+                        
+                        <div class="p-3 border rounded-3 bg-light-subtle d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="fw-semibold small">Result Releases</div>
+                                <div class="text-muted small" style="font-size: 0.75rem;">Get push/email updates instantly once grades are published.</div>
+                            </div>
+                            <div class="form-check form-switch fs-5">
+                                <input class="form-check-input cursor-pointer" type="checkbox" id="result-alerts" checked>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accessibility Support -->
+                <div class="mb-4">
+                    <h4 class="h6 fw-bold mb-3 text-uppercase text-muted" style="letter-spacing: 0.5px;">Accessibility Support</h4>
+                    <div class="p-3 border rounded-3 bg-light-subtle d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="fw-semibold small">High Contrast Text</div>
+                            <div class="text-muted small" style="font-size: 0.75rem;">Enhances readability by adjusting body elements styling contrast.</div>
+                        </div>
+                        <div class="form-check form-switch fs-5">
+                            <input class="form-check-input cursor-pointer" type="checkbox" id="accessibility-contrast" onchange="toggleContrastMode(this.checked)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Actions -->
+                <div class="d-flex justify-content-end gap-3 border-top pt-3 mt-4">
+                    <button type="submit" class="btn btn-primary px-4 rounded-pill">Save Preferences</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Init theme switch value based on html attr
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+        const themeSwitch = document.getElementById('settings-theme-switch');
+        if (themeSwitch) {
+            themeSwitch.checked = (currentTheme === 'dark');
+            themeSwitch.addEventListener('change', () => {
+                const newTheme = themeSwitch.checked ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-bs-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeToggleUI(newTheme);
+            });
+        }
+        
+        // Init high contrast setting from localstorage
+        const contrastSwitch = document.getElementById('accessibility-contrast');
+        if (contrastSwitch) {
+            const contrastOn = localStorage.getItem('contrast-mode') === 'true';
+            contrastSwitch.checked = contrastOn;
+            toggleContrastMode(contrastOn);
+        }
+    });
+
+    function toggleContrastMode(isActive) {
+        localStorage.setItem('contrast-mode', isActive);
+        if (isActive) {
+            document.body.classList.add('high-contrast');
+        } else {
+            document.body.classList.remove('high-contrast');
+        }
+    }
+</script>
+{% endblock %}

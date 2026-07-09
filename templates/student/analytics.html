@@ -1,0 +1,189 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Performance Analytics - EduExam{% endblock %}
+
+{% block content %}
+<!-- AI performance predictions panel -->
+<div class="row g-4 mb-4">
+    <div class="col-md-7 col-lg-8">
+        <div class="card card-premium p-4 h-100 bg-dark text-white border-0 shadow-lg position-relative overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
+            <div class="position-absolute end-0 top-0 p-3 opacity-10">
+                <i class="fa-solid fa-brain" style="font-size: 8rem;"></i>
+            </div>
+            
+            <h3 class="h5 fw-bold text-primary mb-3"><i class="fa-solid fa-microchip-ai me-2"></i>AI Performance Prediction Engine</h3>
+            <p class="small text-white-50 mb-4">We've calculated a moving linear progression trend over your chronological test scores to forecast your academic output on upcoming tests.</p>
+            
+            <div class="row align-items-center g-4">
+                <div class="col-sm-6 text-center border-end border-secondary">
+                    <div class="text-muted small mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Predicted Next Score</div>
+                    <div class="display-4 fw-bold text-success">{{ predicted_score }}%</div>
+                    <div class="text-muted small mt-2">Accuracy threshold +/- 5%</div>
+                </div>
+                <div class="col-sm-6 text-center">
+                    <div class="text-muted small mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Performance Trend</div>
+                    <h4 class="fw-bold text-capitalize text-body mt-2">
+                        {% if trend == 'improving' %}
+                            <i class="fa-solid fa-arrow-trend-up text-success me-2 fs-3"></i><font color="#10b981">Improving</font>
+                        {% elif trend == 'declining' %}
+                            <i class="fa-solid fa-arrow-trend-down text-danger me-2 fs-3"></i><font color="#ef4444">Declining</font>
+                        {% else %}
+                            <i class="fa-solid fa-arrow-right text-warning me-2 fs-3"></i><font color="#f59e0b">Stable</font>
+                        {% endif %}
+                    </h4>
+                    <p class="text-white-50 small mb-0 mt-2">Based on your recent attempts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-5 col-lg-4">
+        <div class="card card-premium p-4 h-100">
+            <h3 class="h6 fw-bold text-uppercase text-muted mb-4" style="letter-spacing: 0.5px;">Subject Diagnostics</h3>
+            
+            <!-- Strong Subject -->
+            <div class="mb-4 d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="fa-solid fa-thumbs-up fs-4"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Strongest Area</div>
+                    <div class="fw-bold text-body fs-6">{{ strongest }}</div>
+                </div>
+            </div>
+            
+            <!-- Weak Subject -->
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="fa-solid fa-triangle-exclamation fs-4"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">Focus Area (Weakest)</div>
+                    <div class="fw-bold text-body fs-6">{{ weakest }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Accuracy & Pass stats row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-premium p-4 text-center">
+            <h3 class="h6 text-uppercase text-muted fw-bold mb-3">Overall MCQ Accuracy</h3>
+            <div class="display-6 fw-bold text-primary">{{ chart_data.accuracy_pct }}%</div>
+            <p class="text-muted small mb-0 mt-2">Correct selections relative to overall questions answered.</p>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-premium p-4 text-center">
+            <h3 class="h6 text-uppercase text-muted fw-bold mb-3">Pass vs Fail Ratio</h3>
+            <div class="d-flex justify-content-center align-items-center gap-4 py-1">
+                <div>
+                    <span class="fs-4 fw-bold text-success">{{ chart_data.pass_count }}</span>
+                    <span class="text-muted small d-block">Passes</span>
+                </div>
+                <div class="vr" style="height: 30px;"></div>
+                <div>
+                    <span class="fs-4 fw-bold text-danger">{{ chart_data.fail_count }}</span>
+                    <span class="text-muted small d-block">Failures</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Graphs Grid -->
+<div class="row g-4 mb-4">
+    <!-- Progress scores -->
+    <div class="col-lg-6">
+        <div class="card card-premium p-4 h-100">
+            <h3 class="h5 mb-4"><i class="fa-solid fa-chart-line text-primary me-2"></i>Academic Progression Chart</h3>
+            <div style="height: 300px; width: 100%;">
+                <canvas id="progressChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Subject scores -->
+    <div class="col-lg-6">
+        <div class="card card-premium p-4 h-100">
+            <h3 class="h5 mb-4"><i class="fa-solid fa-chart-bar text-success me-2"></i>Subject-wise Distribution</h3>
+            <div style="height: 300px; width: 100%;">
+                <canvas id="subjectChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Progress Line chart
+        const ctxProgress = document.getElementById('progressChart').getContext('2d');
+        new Chart(ctxProgress, {
+            type: 'line',
+            data: {
+                labels: {{ chart_data.trend_labels|tojson }},
+                datasets: [{
+                    label: 'Score Obtained (%)',
+                    data: {{ chart_data.trend_scores|tojson }},
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#2563eb'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: 'rgba(128, 128, 128, 0.1)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+        
+        // 2. Subject bar chart
+        const ctxSubject = document.getElementById('subjectChart').getContext('2d');
+        new Chart(ctxSubject, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_data.subject_labels|tojson }},
+                datasets: [{
+                    label: 'Average Score (%)',
+                    data: {{ chart_data.subject_scores|tojson }},
+                    backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                    borderColor: '#10b981',
+                    borderWidth: 1.5,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: 'rgba(128, 128, 128, 0.1)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

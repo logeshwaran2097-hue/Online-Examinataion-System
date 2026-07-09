@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Results - EduExam{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'results' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-semibold">Examination Results</h1>
+            </div>
+            <a href="{{ url_for('admin.export_results_excel') }}" class="btn btn-success btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-file-excel me-1"></i> Export Results (Excel)
+            </a>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 small py-2 px-3 mb-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Filters -->
+            <div class="card card-premium p-4 mb-4">
+                <form method="GET" action="{{ url_for('admin.results') }}" class="row g-3">
+                    <div class="col-md-5">
+                        <label for="search" class="form-label small fw-medium text-muted">Search Student Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0" id="search" name="search" placeholder="Type student name..." value="{{ request.args.get('search', '') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="exam_id" class="form-label small fw-medium text-muted">Filter by Exam</label>
+                        <select class="form-select" id="exam_id" name="exam_id">
+                            <option value="">All Exams</option>
+                            {% for exam in exams %}
+                            <option value="{{ exam.id }}" {% if selected_exam_id == exam.id|string or selected_exam_id == exam.id %}selected{% endif %}>{{ exam.exam_title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100 py-2"><i class="fa-solid fa-filter me-1"></i> Filter</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Data Grid -->
+            <div class="card card-premium p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="small text-muted">
+                                <th>Student Name</th>
+                                <th>Assessment</th>
+                                <th>Obtained Marks</th>
+                                <th>Percentage</th>
+                                <th>Grade</th>
+                                <th>Pass/Fail</th>
+                                <th>Date Generated</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small">
+                            {% for res in results %}
+                            <tr>
+                                <td class="fw-semibold">{{ res.student.full_name }}</td>
+                                <td class="fw-medium text-primary">{{ res.exam.exam_title }}</td>
+                                <td>{{ res.obtained_marks }} / {{ res.total_marks }}</td>
+                                <td class="fw-semibold">{{ res.percentage }}%</td>
+                                <td class="fw-bold">{{ res.grade }}</td>
+                                <td>
+                                    {% if res.pass_fail_status == 'pass' %}
+                                    <span class="badge bg-success rounded-pill px-2.5 py-1">Passed</span>
+                                    {% else %}
+                                    <span class="badge bg-danger rounded-pill px-2.5 py-1">Failed</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ res.generated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('admin.download_transcript', student_id=res.student_id) }}" class="btn btn-outline-secondary btn-sm rounded-3 px-2 py-1" title="Download PDF Transcript">
+                                        <i class="fa-solid fa-file-pdf"></i> Transcript
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">No exam results recorded for the selected filter criteria.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}

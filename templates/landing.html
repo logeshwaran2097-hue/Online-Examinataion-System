@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Online Examination System{% endblock %}
+
+{% block body %}
+<!-- Navigation Header -->
+<header class="glass-header shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center py-3">
+        <a href="{{ url_for('main.index') }}" class="d-flex align-items-center text-decoration-none text-reset">
+            <span class="fs-4 fw-bold text-primary"><i class="fa-solid fa-graduation-cap me-2"></i>EduExam</span>
+        </a>
+        <nav class="d-none d-md-flex align-items-center gap-4">
+            <a href="#features" class="text-decoration-none text-reset fw-medium">Features</a>
+            <a href="#stats" class="text-decoration-none text-reset fw-medium">Statistics</a>
+            <a href="#about" class="text-decoration-none text-reset fw-medium">About</a>
+        </nav>
+        <div class="d-flex align-items-center gap-3">
+            <a href="#" id="theme-toggle" class="btn btn-link text-reset p-2">
+                <i class="fa-solid fa-moon fs-5"></i>
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary px-4 rounded-pill">Login</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary px-4 rounded-pill">Sign Up</a>
+        </div>
+    </div>
+</header>
+
+<!-- Main Container -->
+<main class="animate-fade-in">
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-4" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Hero Section -->
+    <section class="py-5 py-lg-6 mt-lg-3">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold mb-3">Professional Assessment Tool</span>
+                    <h1 class="display-4 fw-extrabold mb-4" style="line-height: 1.2;">
+                        The Smart Way to Evaluate and Excel
+                    </h1>
+                    <p class="lead text-muted mb-4">
+                        A robust, responsive, and highly secure examination system offering automated grading, instant results, analytics, and cheat-resistant tools.
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-5 rounded-pill shadow">Get Started Now</a>
+                        <a href="{{ url_for('admin.login') }}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill"><i class="fa-solid fa-user-shield me-2"></i>Admin Login</a>
+                    </div>
+
+                    <!-- Demo Credentials Card -->
+                    <div class="mt-4 p-4 rounded-4 border border-primary-subtle bg-primary-subtle" style="max-width: 480px;">
+                        <h3 class="h6 fw-bold mb-3 text-primary">
+                            <i class="fa-solid fa-key me-2"></i>Demo Login Credentials
+                        </h3>
+                        <div class="row g-3">
+                            <!-- Admin Login -->
+                            <div class="col-sm-6">
+                                <div class="bg-white rounded-3 p-3 border border-primary-subtle h-100">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <span class="badge bg-danger px-2 py-1 rounded-pill">
+                                            <i class="fa-solid fa-user-shield me-1"></i>Admin
+                                        </span>
+                                    </div>
+                                    <div class="small mb-1">
+                                        <span class="text-muted">Username:</span>
+                                        <code class="ms-1 text-danger fw-bold">admin</code>
+                                    </div>
+                                    <div class="small mb-2">
+                                        <span class="text-muted">Password:</span>
+                                        <code class="ms-1 text-danger fw-bold">adminpassword</code>
+                                    </div>
+                                    <a href="{{ url_for('admin.login') }}" class="btn btn-danger btn-sm rounded-pill px-3 w-100">
+                                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i>Admin Login
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Student Login -->
+                            <div class="col-sm-6">
+                                <div class="bg-white rounded-3 p-3 border border-success-subtle h-100">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <span class="badge bg-success px-2 py-1 rounded-pill">
+                                            <i class="fa-solid fa-user-graduate me-1"></i>Student
+                                        </span>
+                                    </div>
+                                    <div class="small mb-1 text-muted">Register your own account</div>
+                                    <div class="small mb-2 text-muted">or use your registered email & password.</div>
+                                    <a href="{{ url_for('auth.login') }}" class="btn btn-success btn-sm rounded-pill px-3 w-100">
+                                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i>Student Login
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted small mt-2 mb-0">
+                            <i class="fa-solid fa-circle-info me-1"></i>
+                            Admin account is auto-seeded when the app first starts.
+                        </p>
+                    </div>
+                    <!-- End Demo Credentials Card -->
+
+                </div>
+                <div class="col-lg-6 text-center">
+                    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80" alt="Assessment Illustration" class="img-fluid rounded-4 shadow-lg border border-3 border-white">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5 bg-light-subtle border-top border-bottom border-light-subtle">
+        <div class="container">
+            <div class="text-center max-w-2xl mx-auto mb-5">
+                <h2 class="h1 mb-3">Key Features</h2>
+                <p class="text-muted">Discover the tools that make our examination engine powerful, secure, and user-friendly.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card card-premium h-100 p-4">
+                        <div class="text-primary fs-1 mb-3"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h3 class="h4 mb-2">Secure Testing</h3>
+                        <p class="text-muted mb-0">Cheat-resistant features including locked browsers and session surveillance to ensure academic integrity.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-premium h-100 p-4">
+                        <div class="text-success fs-1 mb-3"><i class="fa-solid fa-bolt"></i></div>
+                        <h3 class="h4 mb-2">Instant Results</h3>
+                        <p class="text-muted mb-0">Automated grading engine processes results instantly upon submission and triggers digital scoring graphs.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-premium h-100 p-4">
+                        <div class="text-warning fs-1 mb-3"><i class="fa-solid fa-file-pdf"></i></div>
+                        <h3 class="h4 mb-2">PDF Report Exports</h3>
+                        <p class="text-muted mb-0">Students and administrators can immediately download professional, formatted PDF assessment sheets.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section id="stats" class="py-5">
+        <div class="container">
+            <div class="row g-4 text-center">
+                <div class="col-md-3 col-6">
+                    <h3 class="display-5 fw-bold text-primary mb-1">10k+</h3>
+                    <p class="text-muted mb-0">Active Students</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <h3 class="display-5 fw-bold text-success mb-1">500+</h3>
+                    <p class="text-muted mb-0">Exams Hosted</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <h3 class="display-5 fw-bold text-warning mb-1">99.9%</h3>
+                    <p class="text-muted mb-0">System Uptime</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <h3 class="display-5 fw-bold text-info mb-1">Instant</h3>
+                    <p class="text-muted mb-0">PDF Generation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-light-subtle border-top border-light-subtle">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" alt="About System" class="img-fluid rounded-4 shadow">
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="h1 mb-4">Empowering Modern Classrooms</h2>
+                    <p class="text-muted mb-3">
+                        EduExam is built to solve testing bottlenecks in digital learning. We provide educators with easy tools to construct question banks, monitor student outcomes, and auto-generate report sheets.
+                    </p>
+                    <p class="text-muted mb-4">
+                        For students, our system provides clean, low-latency, and accessible examination rooms compatible with standard desktops, tablets, and smartphones.
+                    </p>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary rounded-pill px-4">Register as a Student</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="py-5 border-top border-light-subtle mt-5">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
+            <div class="d-flex align-items-center">
+                <span class="fs-5 fw-bold text-primary"><i class="fa-solid fa-graduation-cap me-2"></i>EduExam</span>
+            </div>
+            <div class="text-muted text-center text-md-end small">
+                &copy; 2026 EduExam. All rights reserved. Designed for professional assessment.
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock %}

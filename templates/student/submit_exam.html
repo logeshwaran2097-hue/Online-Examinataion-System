@@ -1,0 +1,37 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Confirm Submission - EduExam{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center flex-grow-1 py-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="card card-premium p-4 text-center">
+            <div class="mb-4">
+                <div class="rounded-circle bg-danger-subtle text-danger d-inline-flex align-items-center justify-content-center border border-danger-subtle" style="width: 72px; height: 72px;">
+                    <i class="fa-solid fa-triangle-exclamation fs-1"></i>
+                </div>
+            </div>
+
+            <h3 class="fw-bold mb-2">Final Submission Confirmation</h3>
+            <p class="text-muted small mb-4">You are about to submit your responses for grading. This action is final and locks your exam session immediately.</p>
+
+            <!-- Confirm Warning -->
+            <div class="alert alert-warning text-start small rounded-3 mb-4">
+                <ul class="mb-0 ps-3">
+                    <li>Once submitted, you cannot change any answers.</li>
+                    <li>Unanswered questions will receive 0 marks.</li>
+                    <li>Automatic proctor logs will be synchronized and finalized.</li>
+                </ul>
+            </div>
+
+            <!-- Actions -->
+            <form action="{{ url_for('exam.submit_exam_processing', exam_id=exam.id) }}" method="POST">
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{{ url_for('exam.review_questions', exam_id=exam.id) }}" class="btn btn-outline-secondary px-4 rounded-pill">Back to Review</a>
+                    <button type="submit" class="btn btn-danger px-4 rounded-pill"><i class="fa-solid fa-circle-check me-2"></i>Submit Final Exam</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

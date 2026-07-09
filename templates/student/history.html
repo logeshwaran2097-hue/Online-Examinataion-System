@@ -1,0 +1,45 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Activity History - EduExam{% endblock %}
+
+{% block content %}
+<div class="card card-premium p-4 mb-4">
+    <h3 class="h4 mb-1 fw-bold"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Security & Activity Audit</h3>
+    <p class="text-muted small mb-0">Review audit trail of actions conducted using this student account.</p>
+</div>
+
+<!-- History logs table -->
+<div class="card card-premium p-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 text-center">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col" class="text-start">Activity Action</th>
+                    <th scope="col">IP Address</th>
+                    <th scope="col" class="text-start">Web Browser</th>
+                    <th scope="col">Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs %}
+                    {% for log in logs %}
+                        <tr>
+                            <td class="text-start fw-semibold text-body">{{ log.activity }}</td>
+                            <td><span class="badge bg-secondary-subtle text-secondary rounded-3">{{ log.ip_address }}</span></td>
+                            <td class="text-start text-muted small text-truncate" style="max-width: 320px;" title="{{ log.browser }}">{{ log.browser }}</td>
+                            <td class="text-muted small">{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-clock-rotate-left fs-1 mb-3 text-secondary d-block"></i>
+                            No activity entries recorded yet.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

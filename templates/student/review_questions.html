@@ -1,0 +1,125 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Review Attempt - {{ exam.exam_title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Header -->
+        <div class="card card-premium p-4 mb-4">
+            <h2 class="h4 fw-bold mb-1"><i class="fa-solid fa-clipboard-check text-success me-2"></i>Review Examination Attempt</h2>
+            <p class="text-muted small mb-0">Double check your responses before finalizing and submitting your exam.</p>
+        </div>
+
+        <!-- Stats row -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3 text-center">
+                <div class="p-3 bg-light-subtle border rounded-3 h-100 d-flex flex-column justify-content-center">
+                    <div class="text-muted small mb-1">Total Questions</div>
+                    <h3 class="fw-bold mb-0 text-primary">{{ total }}</h3>
+                </div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="p-3 bg-light-subtle border rounded-3 h-100 d-flex flex-column justify-content-center">
+                    <div class="text-muted small mb-1">Answered</div>
+                    <h3 class="fw-bold mb-0 text-success">{{ answered }}</h3>
+                </div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="p-3 bg-light-subtle border rounded-3 h-100 d-flex flex-column justify-content-center">
+                    <div class="text-muted small mb-1">Unanswered</div>
+                    <h3 class="fw-bold mb-0 {% if unanswered > 0 %}text-danger{% else %}text-muted{% endif %}">{{ unanswered }}</h3>
+                </div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="p-3 bg-light-subtle border rounded-3 h-100 d-flex flex-column justify-content-center">
+                    <div class="text-muted small mb-1">Marked for Review</div>
+                    <h3 class="fw-bold mb-0 {% if flagged > 0 %}text-warning{% else %}text-muted{% endif %}">{{ flagged }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning block if unanswered -->
+        {% if unanswered > 0 or flagged > 0 %}
+        <div class="alert alert-warning rounded-4 shadow-sm mb-4 d-flex align-items-center gap-3">
+            <i class="fa-solid fa-triangle-exclamation fs-3"></i>
+            <div>
+                <div class="fw-bold">Attention Required</div>
+                <div class="small">
+                    {% if unanswered > 0 %}You have <b>{{ unanswered }}</b> unanswered question(s). {% endif %}
+                    {% if flagged > 0 %}You have <b>{{ flagged }}</b> question(s) marked for review. {% endif %}
+                    We highly recommend jumping back to answer them before submitting.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Questions status grid -->
+        <div class="card card-premium p-4 mb-4">
+            <h3 class="h6 fw-bold text-uppercase text-muted mb-3" style="letter-spacing: 0.5px;">Question Status Board</h3>
+            
+            <div class="row g-3">
+                {% for q in questions %}
+                    {% set is_answered = q.id in saved_map %}
+                    {% set is_flagged = q.id in flags %}
+                    
+                    <div class="col-sm-6 col-md-4">
+                        <div class="p-3 border rounded-3 bg-light-subtle d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="fw-bold text-body small">Question {{ loop.index }}</span>
+                                <div class="text-muted small text-truncate" style="max-width: 150px;">{{ q.question_text[:30] }}...</div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                {% if is_flagged %}
+                                    <span class="badge bg-warning text-white rounded-pill small" title="Marked for Review"><i class="fa-solid fa-flag"></i></span>
+                                {% endif %}
+                                {% if is_answered %}
+                                    <span class="badge bg-success text-white rounded-pill small" title="Answered"><i class="fa-solid fa-check"></i></span>
+                                {% else %}
+                                    <span class="badge bg-danger text-white rounded-pill small" title="Unanswered"><i class="fa-solid fa-xmark"></i></span>
+                                {% endif %}
+                                <a href="{{ url_for('exam.take_exam_view', exam_id=exam.id, q=loop.index0) }}" class="btn btn-outline-primary btn-sm rounded-circle" style="width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Edit Response">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('exam.take_exam_view', exam_id=exam.id, q=total-1) }}" class="btn btn-outline-secondary px-4 rounded-pill"><i class="fa-solid fa-arrow-left me-2"></i>Return to Quiz</a>
+            <button class="btn btn-danger px-4 rounded-pill fw-bold" onclick="confirmSubmit();"><i class="fa-solid fa-circle-check me-2"></i>Submit Examination</button>
+        </div>
+    </div>
+</div>
+
+<form action="{{ url_for('exam.submit_exam_processing', exam_id=exam.id) }}" method="POST" id="submit-exam-final-form" class="d-none"></form>
+{% endblock %}
+
+{% block extra_js %}
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmSubmit() {
+        Swal.fire({
+            title: 'Final Submission?',
+            text: "Are you absolutely sure you want to finish and submit your exam? All choices will be scored and you cannot edit them afterward.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, Submit Final Exam',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit Form
+                document.getElementById('submit-final-fullscreen-check');
+                document.getElementById('submit-exam-final-form').submit();
+            }
+        });
+    }
+</script>
+{% endblock %}

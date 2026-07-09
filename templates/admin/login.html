@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login - Online Examination System{% endblock %}
+
+{% block body %}
+<div class="min-vh-100 d-flex flex-column justify-content-center align-items-center py-5 bg-dark" style="background: radial-gradient(circle, #1e293b 0%, #0f172a 100%) !important;">
+    <div class="container d-flex justify-content-end max-w-sm mb-3" style="max-width: 420px; width: 100%;">
+        <a href="#" id="theme-toggle" class="btn btn-link text-white-50 p-2">
+            <i class="fa-solid fa-moon fs-5"></i>
+        </a>
+    </div>
+
+    <div class="card card-premium shadow-lg p-4 p-md-5 border-secondary animate-fade-in text-white" style="max-width: 420px; width: 100%; background-color: #1e293b; border-color: #334155 !important;">
+        <div class="text-center mb-4">
+            <span class="fs-1 text-info"><i class="fa-solid fa-user-shield"></i></span>
+            <h1 class="h4 mt-3 fw-bold">Admin Console</h1>
+            <p class="text-white-50 small">Authorized Administrative Personnel Only</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 small py-2 px-3 mb-3 bg-opacity-10 text-white border-0" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.75rem 1rem;"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('admin.login') }}" method="POST" class="needs-validation" novalidate>
+            <!-- Username/Email -->
+            <div class="mb-3">
+                <label for="username" class="form-label small fw-medium text-white-50">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text border-end-0 text-white-50" style="background-color: #0f172a; border-color: #475569;"><i class="fa-solid fa-user-lock"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0 text-white" id="username" name="username" placeholder="admin" required style="background-color: #0f172a; border-color: #475569;">
+                    <div class="invalid-feedback">Username required.</div>
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-4">
+                <label for="password" class="form-label small fw-medium text-white-50">Console Password</label>
+                <div class="input-group">
+                    <span class="input-group-text border-end-0 text-white-50" style="background-color: #0f172a; border-color: #475569;"><i class="fa-solid fa-key"></i></span>
+                    <input type="password" class="form-control border-start-0 ps-0 border-end-0 text-white" id="password" name="password" placeholder="••••••••" required style="background-color: #0f172a; border-color: #475569;">
+                    <button class="btn border-start-0 bg-transparent border-end border-top border-bottom text-white-50 password-toggle" type="button" data-target="password" style="border-color: #475569;">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <div class="invalid-feedback">Password is required.</div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-info w-100 py-2.5 rounded-3 fw-semibold text-dark">Authenticate</button>
+        </form>
+
+        <div class="text-center mt-4">
+            <p class="small text-white-50 mb-0"><a href="{{ url_for('main.index') }}" class="text-white-50 text-decoration-none"><i class="fa-solid fa-arrow-left me-2"></i>Return to Portal</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

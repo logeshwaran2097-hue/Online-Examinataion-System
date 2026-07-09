@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Certificate Management - EduExam{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'certificates' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-semibold">Certificate Registry</h1>
+            </div>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 small py-2 px-3 mb-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="row g-4">
+                <!-- Generate Certificate -->
+                <div class="col-lg-4">
+                    <div class="card card-premium p-4">
+                        <h3 class="h6 fw-bold mb-3"><i class="fa-solid fa-stamp me-1 text-primary"></i>Issue Certificate</h3>
+                        <p class="text-muted small">Select an eligible passing student result record to generate a secure QR-verifiable certificate.</p>
+                        
+                        <form action="{{ url_for('admin.generate_certificate') }}" method="POST" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="result_id" class="form-label small text-muted">Select Student Passing Record</label>
+                                <select class="form-select small" id="result_id" name="result_id" required>
+                                    <option value="" disabled selected>Select Passing Result</option>
+                                    {% for r in results %}
+                                    <option value="{{ r.id }}">{{ r.student.full_name }} - {{ r.exam.exam_title }} ({{ r.percentage }}%)</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">A selection is required.</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 py-2 small fw-semibold"><i class="fa-solid fa-gears me-1"></i> Generate Certificate</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Certificates list -->
+                <div class="col-lg-8">
+                    <div class="card card-premium p-4">
+                        <h3 class="h6 fw-bold mb-3"><i class="fa-solid fa-ribbon me-1 text-warning"></i>Generated Certificates</h3>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr class="small text-muted">
+                                        <th>Certificate No</th>
+                                        <th>Student</th>
+                                        <th>Exam / Subject</th>
+                                        <th>Verification QR</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="small">
+                                    {% for c in certificates %}
+                                    <tr>
+                                        <td class="fw-semibold">{{ c.certificate_number }}</td>
+                                        <td>
+                                            <div class="fw-semibold">{{ c.student.full_name }}</div>
+                                            <div class="text-muted small">{{ c.student.email }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold text-primary">{{ c.exam.exam_title }}</div>
+                                            <div class="text-muted small">{{ c.generated_date.strftime('%Y-%m-%d') }}</div>
+                                        </td>
+                                        <td>
+                                            {% if c.qr_code %}
+                                            <img src="{{ c.qr_code }}" style="width: 45px; height: 45px;" class="border rounded p-0.5 bg-light" title="Scan to verify online">
+                                            {% else %}
+                                            <span class="text-muted small">No QR</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ url_for('admin.download_certificate', cert_id=c.id) }}" class="btn btn-outline-primary btn-sm rounded-3 py-1 px-2.5">
+                                                <i class="fa-solid fa-download me-1"></i> Download
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">No certificates issued yet. Pass results and issue above.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Bootstrap standard validation hook
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
+{% endblock %}

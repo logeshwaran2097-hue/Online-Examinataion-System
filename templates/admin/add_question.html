@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Add Question - EduExam{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'questions' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-semibold">Add Question</h1>
+            </div>
+            <a href="{{ url_for('admin.questions') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Bank
+            </a>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            <div class="card card-premium p-4 p-md-5 max-w-lg mx-auto" style="max-width: 680px;">
+                <div class="mb-4 text-center">
+                    <span class="fs-1 text-primary"><i class="fa-solid fa-plus"></i></span>
+                    <h2 class="h4 fw-bold mt-2">New Assessment Question</h2>
+                    <p class="text-muted small">Select an exam template and enter the problem text and correct answers.</p>
+                </div>
+
+                <form action="{{ url_for('admin.add_question') }}" method="POST" class="needs-validation" novalidate>
+                    <!-- Exam Selection -->
+                    <div class="mb-3">
+                        <label for="exam_id" class="form-label small fw-medium">Map to Exam</label>
+                        <select class="form-select" id="exam_id" name="exam_id" required>
+                            <option value="" disabled selected>Select an Exam Template</option>
+                            {% for exam in exams %}
+                            <option value="{{ exam.id }}">{{ exam.exam_title }} ({{ exam.subject_name }})</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Please link to a valid exam.</div>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="mb-3">
+                        <label for="question_text" class="form-label small fw-medium">Question Text</label>
+                        <textarea class="form-control" id="question_text" name="question_text" rows="4" placeholder="Type question description..." required></textarea>
+                        <div class="invalid-feedback">Please enter the question text.</div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Type -->
+                        <div class="col-md-4 mb-3">
+                            <label for="question_type" class="form-label small fw-medium">Question Type</label>
+                            <select class="form-select" id="question_type" name="question_type" required>
+                                <option value="mcq" selected>Multiple Choice (MCQ)</option>
+                                <option value="true_false">True / False</option>
+                                <option value="subjective">Subjective (Written)</option>
+                            </select>
+                        </div>
+
+                        <!-- Difficulty -->
+                        <div class="col-md-4 mb-3">
+                            <label for="difficulty_level" class="form-label small fw-medium">Difficulty Level</label>
+                            <select class="form-select" id="difficulty_level" name="difficulty_level" required>
+                                <option value="easy">Easy</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+
+                        <!-- Marks -->
+                        <div class="col-md-4 mb-3">
+                            <label for="marks" class="form-label small fw-medium">Marks / Value</label>
+                            <input type="number" class="form-control" id="marks" name="marks" value="1" min="1" required>
+                            <div class="invalid-feedback">Enter points.</div>
+                        </div>
+                    </div>
+
+                    <!-- MCQ Choices Options (Only display when MCQ) -->
+                    <div id="mcq-options-container" class="border rounded-3 p-3 bg-light-subtle mb-4">
+                        <h4 class="h6 fw-bold mb-3"><i class="fa-solid fa-list-check me-1 text-primary"></i> MCQ Choices Options</h4>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <label for="option_a" class="form-label small text-muted">Option A</label>
+                                <input type="text" class="form-control" id="option_a" name="option_a" placeholder="First option choice">
+                            </div>
+                            <div class="col-6">
+                                <label for="option_b" class="form-label small text-muted">Option B</label>
+                                <input type="text" class="form-control" id="option_b" name="option_b" placeholder="Second option choice">
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label for="option_c" class="form-label small text-muted">Option C</label>
+                                <input type="text" class="form-control" id="option_c" name="option_c" placeholder="Third option choice">
+                            </div>
+                            <div class="col-6">
+                                <label for="option_d" class="form-label small text-muted">Option D</label>
+                                <input type="text" class="form-control" id="option_d" name="option_d" placeholder="Fourth option choice">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Correct Answer -->
+                    <div class="mb-4">
+                        <label for="correct_answer" class="form-label small fw-medium">Correct Option / Key</label>
+                        <select class="form-select text-success fw-bold" id="correct_answer" name="correct_answer" required>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="TRUE">True (True/False mode)</option>
+                            <option value="FALSE">False (True/False mode)</option>
+                        </select>
+                        <div class="invalid-feedback">Identify correct choice.</div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3 fw-semibold">Save Question</button>
+                </form>
+            </div>
+        </main>
+
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questionType = document.getElementById('question_type');
+        const mcqContainer = document.getElementById('mcq-options-container');
+        
+        questionType.addEventListener('change', () => {
+            if (questionType.value === 'mcq') {
+                mcqContainer.style.display = 'block';
+            } else {
+                mcqContainer.style.display = 'none';
+            }
+        });
+        
+        // Form validations
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
+{% endblock %}

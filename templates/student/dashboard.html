@@ -1,0 +1,220 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Student Dashboard - EduExam{% endblock %}
+
+{% block content %}
+<!-- Welcome & Quick Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="card card-premium p-4 h-100 d-flex flex-column justify-content-center text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important; border: none;">
+            <h2 class="fw-bold mb-2">Welcome Back, {{ current_user.full_name }}!</h2>
+            {% if stats.upcoming_exams > 0 %}
+                <p class="mb-0 text-white-50">You have <b>{{ stats.upcoming_exams }}</b> upcoming exam(s) scheduled. Keep up the excellent work!</p>
+            {% else %}
+                <p class="mb-0 text-white-50">All caught up! No pending exams scheduled for this week. Use this time to review your subjects.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card card-premium p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="small fw-semibold text-muted">Current Ranking</span>
+                <span class="badge bg-success-subtle text-success px-2 py-1 rounded-3">Global Position</span>
+            </div>
+            <h2 class="display-6 fw-bold mb-1">Rank #{{ stats.current_rank }}</h2>
+            {% if stats.exams_completed > 0 %}
+                <p class="text-muted small mb-0">Calculated across your completed assessments.</p>
+            {% else %}
+                <p class="text-muted small mb-0">Attempt exams to enter the leaderboard.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Grid -->
+<div class="row g-4 mb-4">
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card card-premium p-3 text-center h-100">
+            <div class="text-primary mb-2"><i class="fa-solid fa-file-circle-question fs-3"></i></div>
+            <div class="h5 mb-0 fw-bold">{{ stats.total_available }}</div>
+            <div class="text-muted small">Exams Available</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card card-premium p-3 text-center h-100">
+            <div class="text-success mb-2"><i class="fa-solid fa-circle-check fs-3"></i></div>
+            <div class="h5 mb-0 fw-bold">{{ stats.exams_completed }}</div>
+            <div class="text-muted small">Exams Completed</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card card-premium p-3 text-center h-100">
+            <div class="text-warning mb-2"><i class="fa-solid fa-calendar-days fs-3"></i></div>
+            <div class="h5 mb-0 fw-bold">{{ stats.upcoming_exams }}</div>
+            <div class="text-muted small">Upcoming Exams</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card card-premium p-3 text-center h-100">
+            <div class="text-info mb-2"><i class="fa-solid fa-star fs-3"></i></div>
+            <div class="h5 mb-0 fw-bold">{{ stats.average_score }}%</div>
+            <div class="text-muted small">Average Score</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card card-premium p-3 text-center h-100">
+            <div class="text-danger mb-2"><i class="fa-solid fa-medal fs-3"></i></div>
+            <div class="h5 mb-0 fw-bold">{% if stats.current_rank != 'N/A' %}#{{ stats.current_rank }}{% else %}-{% endif %}</div>
+            <div class="text-muted small">Leaderboard Rank</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card card-premium p-3 text-center h-100">
+            <div class="text-secondary mb-2"><i class="fa-solid fa-award fs-3"></i></div>
+            <div class="h5 mb-0 fw-bold">{{ stats.certificates_earned }}</div>
+            <div class="text-muted small">Certificates</div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Split Row -->
+<div class="row g-4 mb-4">
+    <!-- Available Exams Widget -->
+    <div class="col-lg-7">
+        <div class="card card-premium p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="h5 mb-0"><i class="fa-solid fa-clipboard-list me-2 text-primary"></i>Active Examinations</h3>
+                <a href="{{ url_for('student.exams') }}" class="small text-decoration-none">View All</a>
+            </div>
+            <div class="d-flex flex-column gap-3">
+                {% if available_exams %}
+                    {% for exam in available_exams %}
+                        <div class="p-3 border rounded-3 bg-light-subtle d-flex flex-sm-row flex-column justify-content-between align-items-sm-center gap-3">
+                            <div>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill mb-1 small">{{ exam.subject_name }}</span>
+                                <h4 class="h6 mb-1 fw-bold">{{ exam.exam_title }}</h4>
+                                <div class="text-muted small">
+                                    <i class="fa-solid fa-circle-question me-1"></i> {{ exam.total_questions }} Questions
+                                    <span class="mx-1 text-black-50">&bull;</span>
+                                    <i class="fa-solid fa-clock me-1"></i> {{ exam.duration_minutes }} Mins
+                                    <span class="mx-1 text-black-50">&bull;</span>
+                                    <i class="fa-solid fa-calendar me-1"></i> {{ exam.exam_date.strftime('%Y-%m-%d') if exam.exam_date else 'TBD' }}
+                                </div>
+                            </div>
+                            <div>
+                                {% if exam.id in completed_exam_ids %}
+                                    <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill"><i class="fa-solid fa-check me-1"></i>Completed</span>
+                                {% else %}
+                                    <a href="{{ url_for('student.exam_instructions', exam_id=exam.id) }}" class="btn btn-primary btn-sm px-3 rounded-pill">Start Assessment</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-box-open fs-2 mb-2 d-block"></i>
+                        No active examinations listed right now.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Grades -->
+    <div class="col-lg-5">
+        <div class="card card-premium p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="h5 mb-0"><i class="fa-solid fa-graduation-cap me-2 text-success"></i>Recent Results</h3>
+                <a href="{{ url_for('student.results') }}" class="small text-decoration-none">View All</a>
+            </div>
+            <div class="d-flex flex-column gap-3">
+                {% if recent_results %}
+                    {% for result in recent_results %}
+                        <div class="p-3 border rounded-3 bg-light-subtle d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="h6 mb-1 fw-bold">{{ result.exam.exam_title }}</h4>
+                                <div class="text-muted small"><i class="fa-solid fa-calendar me-1"></i> {{ result.generated_at.strftime('%Y-%m-%d') }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold fs-5 text-primary">{{ result.percentage }}%</div>
+                                <span class="badge {{ 'bg-success' if result.pass_fail_status == 'pass' else 'bg-danger' }} rounded-pill px-2 py-0.5 text-capitalize small">
+                                    {{ result.pass_fail_status }}
+                                </span>
+                                <a href="{{ url_for('student.review_exam', exam_id=result.exam_id, result_id=result.id) }}" class="d-block small text-decoration-none mt-1">Review</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-folder-open fs-2 mb-2 d-block"></i>
+                        You have not taken any exams yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Trend Chart -->
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card card-premium p-4">
+            <h3 class="h5 mb-4"><i class="fa-solid fa-chart-column me-2 text-info"></i>Academic Progress Trend</h3>
+            <div style="height: 300px; width: 100%;">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('performanceChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ trend_data.labels|tojson }},
+                    datasets: [{
+                        label: 'Your Score (%)',
+                        data: {{ trend_data['values']|tojson }},
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#2563eb',
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(128, 128, 128, 0.15)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

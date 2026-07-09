@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Student - {{ student.full_name }} - EduExam{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% set active_page = 'students' %}
+    {% include "admin/sidebar.html" %}
+
+    <div class="dashboard-content">
+        <header class="glass-header px-4 py-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="h5 mb-0 fw-semibold">Edit Student Profile</h1>
+            </div>
+            <a href="{{ url_for('admin.student_profile', student_id=student.id) }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Profile
+            </a>
+        </header>
+
+        <main class="p-4 flex-grow-1 animate-fade-in">
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show rounded-3 mb-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endwith %}
+
+            <div class="row justify-content-center">
+                <div class="col-lg-7">
+                    <div class="card card-premium p-4">
+                        <div class="d-flex align-items-center gap-3 mb-4 border-bottom pb-3">
+                            <div class="rounded-circle bg-primary-subtle text-primary fs-4 d-inline-flex justify-content-center align-items-center" style="width: 52px; height: 52px;">
+                                <i class="fa-solid fa-user-pen"></i>
+                            </div>
+                            <div>
+                                <h2 class="h6 fw-bold mb-0">{{ student.full_name }}</h2>
+                                <p class="text-muted small mb-0">{{ student.email }}</p>
+                            </div>
+                        </div>
+
+                        <form method="POST" action="{{ url_for('admin.edit_student', student_id=student.id) }}" novalidate>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label fw-medium small">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" id="name" name="name" class="form-control rounded-3"
+                                       value="{{ student.full_name }}" placeholder="Student's full name" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="phone" class="form-label fw-medium small">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" class="form-control rounded-3"
+                                       value="{{ student.phone_number or '' }}" placeholder="e.g. 9876543210">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="department" class="form-label fw-medium small">Department</label>
+                                <select id="department" name="department" class="form-select rounded-3">
+                                    <option value="">— Select Department —</option>
+                                    {% set departments = ['Computer Science', 'Information Technology', 'Electronics', 'Mechanical', 'Civil', 'Electrical', 'Business Administration', 'Mathematics', 'Physics', 'Other'] %}
+                                    {% for dept in departments %}
+                                    <option value="{{ dept }}" {% if student.department == dept %}selected{% endif %}>{{ dept }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="year_of_study" class="form-label fw-medium small">Year of Study</label>
+                                <select id="year_of_study" name="year_of_study" class="form-select rounded-3">
+                                    <option value="">— Select Year —</option>
+                                    {% for yr in range(1, 9) %}
+                                    <option value="{{ yr }}" {% if student.year_of_study == yr %}selected{% endif %}>Year {{ yr }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                    <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+                                </button>
+                                <a href="{{ url_for('admin.student_profile', student_id=student.id) }}" class="btn btn-outline-secondary rounded-pill px-4">
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-3 border-top border-light-subtle bg-light-subtle text-center text-muted small mt-auto">
+            &copy; 2026 EduExam. Administrative Dashboard.
+        </footer>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}My Certificates - EduExam{% endblock %}
+
+{% block content %}
+<div class="card card-premium p-4 mb-4">
+    <h3 class="h4 mb-1 fw-bold"><i class="fa-solid fa-award text-warning me-2"></i>My Digital Credentials</h3>
+    <p class="text-muted small mb-0">Showcase and verify your earned academic accomplishments.</p>
+</div>
+
+<!-- Certificates grid -->
+<div class="row g-4">
+    {% if certificates %}
+        {% for cert in certificates %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-premium p-4 h-100 d-flex flex-column justify-content-between text-center">
+                    <!-- Certificate header icon -->
+                    <div class="mb-3">
+                        <div class="rounded-circle bg-warning-subtle text-warning d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fa-solid fa-award fs-2"></i>
+                        </div>
+                    </div>
+
+                    <!-- Exam & Serial details -->
+                    <div>
+                        <h4 class="h6 fw-bold mb-1 mt-2 text-body">{{ cert.exam.exam_title }}</h4>
+                        <span class="badge bg-primary-subtle text-primary rounded-pill small mb-3">{{ cert.exam.subject_name }}</span>
+                        
+                        <!-- Serial -->
+                        <div class="bg-light-subtle border rounded-3 p-2 text-muted mb-4" style="font-family: monospace; font-size: 0.8rem;">
+                            {{ cert.certificate_number }}
+                        </div>
+                    </div>
+
+                    <!-- QR code image for validation -->
+                    {% if cert.qr_code %}
+                    <div class="mb-4">
+                        <!-- We can render a tiny qrcode of the URL client-side dynamically, or show a QR placeholder image since we embed it in the PDF! -->
+                        <!-- Let's show verification url text or QR icon -->
+                        <div class="small text-muted"><i class="fa-solid fa-qrcode me-1 text-primary"></i>QR Code Protected</div>
+                        <a href="{{ cert.qr_code }}" target="_blank" class="small text-decoration-none" style="font-size: 0.75rem;">Public Verify URL</a>
+                    </div>
+                    {% endif %}
+
+                    <!-- Download PDF Action -->
+                    <div class="d-grid mt-auto">
+                        <a href="{{ url_for('student.download_certificate', cert_id=cert.id) }}" class="btn btn-primary rounded-pill">
+                            <i class="fa-solid fa-download me-2"></i>Download PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="card card-premium p-5 text-center text-muted">
+                <i class="fa-solid fa-award fs-1 mb-3 text-secondary"></i>
+                <h5>No Certificates Earned Yet</h5>
+                <p class="small mb-0">Certificates are automatically generated when you pass an examination. Study hard and take your first test!</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
