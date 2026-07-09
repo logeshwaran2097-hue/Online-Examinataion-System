@@ -124,6 +124,11 @@ function initSidebar() {
     if (overlay) {
         overlay.addEventListener('click', closeSidebar);
     }
+
+    // Collapse by default on mobile viewports on load
+    if (window.innerWidth < 992 && sidebar) {
+        closeSidebar();
+    }
 }
 
 /**
