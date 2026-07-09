@@ -16,6 +16,9 @@ def _build_db_url():
         # Handle Heroku-style 'postgres://' -> 'postgresql://'
         if url.startswith('postgres://'):
             url = url.replace('postgres://', 'postgresql://', 1)
+        # On Vercel, SQLite database must be in the writeable /tmp folder
+        if os.environ.get('VERCEL') == '1' and url.startswith('sqlite:///'):
+            url = 'sqlite:////tmp/db.sqlite'
         return url
     host = os.environ.get('DB_HOST', 'localhost')
     port = os.environ.get('DB_PORT', '5432')
@@ -49,11 +52,11 @@ class Config:
     WTF_CSRF_TIME_LIMIT = 3600         # 1 hour
 
     # ── File Uploads ─────────────────────────────────────────
-    UPLOAD_FOLDER       = os.path.join(BASE_DIR, 'uploads')
+    UPLOAD_FOLDER       = '/tmp/uploads' if os.environ.get('VERCEL') == '1' else os.path.join(BASE_DIR, 'uploads')
     MAX_CONTENT_LENGTH  = int(os.environ.get('MAX_CONTENT_LENGTH', 5 * 1024 * 1024))
 
     # ── Logging ──────────────────────────────────────────────
-    LOG_DIR = os.path.join(BASE_DIR, 'logs')
+    LOG_DIR = '/tmp/logs' if os.environ.get('VERCEL') == '1' else os.path.join(BASE_DIR, 'logs')
 
     # ── Flask-Mail ───────────────────────────────────────────
     MAIL_SERVER         = os.environ.get('MAIL_SERVER',   'smtp.gmail.com')

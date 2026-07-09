@@ -24,30 +24,39 @@ def create_app(config_name=None):
     app.config.from_object(config_class)
 
     # ── Create required directories ──────────────────────────
-    for sub in ['', 'proctoring', 'profiles']:
-        os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], sub), exist_ok=True)
+    try:
+        for sub in ['', 'proctoring', 'profiles']:
+            os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], sub), exist_ok=True)
 
-    # static/images and static/logo for the spec structure
-    os.makedirs(os.path.join(app.root_path, 'static', 'images'), exist_ok=True)
-    os.makedirs(os.path.join(app.root_path, 'static', 'logo'),   exist_ok=True)
+        # static/images and static/logo for the spec structure
+        os.makedirs(os.path.join(app.root_path, 'static', 'images'), exist_ok=True)
+        os.makedirs(os.path.join(app.root_path, 'static', 'logo'),   exist_ok=True)
 
-    log_dir = app.config.get('LOG_DIR', os.path.join(app.root_path, 'logs'))
-    os.makedirs(log_dir, exist_ok=True)
+        log_dir = app.config.get('LOG_DIR', os.path.join(app.root_path, 'logs'))
+        os.makedirs(log_dir, exist_ok=True)
+    except OSError as e:
+        app.logger.warning(f"Directory creation skipped/failed: {e}")
 
     # ── Logging setup ────────────────────────────────────────
+    log_dir = app.config.get('LOG_DIR', os.path.join(app.root_path, 'logs'))
     if not app.debug:
-        file_handler = RotatingFileHandler(
-            os.path.join(log_dir, 'oes.log'),
-            maxBytes=1_048_576,   # 1 MB per file
-            backupCount=10
-        )
-        file_handler.setFormatter(logging.Formatter(
-            '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
-        ))
-        file_handler.setLevel(logging.INFO)
-        app.logger.addHandler(file_handler)
-        app.logger.setLevel(logging.INFO)
-        app.logger.info('Online Examination System startup')
+        try:
+            file_handler = RotatingFileHandler(
+                os.path.join(log_dir, 'oes.log'),
+                maxBytes=1_048_576,   # 1 MB per file
+                backupCount=10
+            )
+            file_handler.setFormatter(logging.Formatter(
+                '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+            ))
+            file_handler.setLevel(logging.INFO)
+            app.logger.addHandler(file_handler)
+            app.logger.setLevel(logging.INFO)
+            app.logger.info('Online Examination System startup')
+        except Exception as e:
+            # Fallback to console logging if file logging is not possible (e.g. read-only system)
+            logging.basicConfig(level=logging.INFO)
+            app.logger.warning(f"RotatingFileHandler failed, logging falls back to console: {e}")
 
     # ── Initialize Flask extensions ──────────────────────────
     db.init_app(app)
