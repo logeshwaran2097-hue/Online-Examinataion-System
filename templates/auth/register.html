@@ -36,7 +36,7 @@
                 <label for="name" class="form-label small fw-medium">Full Name</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-user"></i></span>
-                    <input type="text" class="form-control border-start-0 ps-0" id="name" name="name" placeholder="John Doe" required>
+                    <input type="text" class="form-control border-start-0 ps-0" id="name" name="name" required>
                     <div class="invalid-feedback">Please enter your full name.</div>
                 </div>
             </div>
@@ -45,12 +45,12 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="email" class="form-label small fw-medium">Email Address</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="john@example.com" required>
+                    <input type="email" class="form-control" id="email" name="email" required>
                     <div class="invalid-feedback">Valid email required.</div>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="phone" class="form-label small fw-medium">Phone Number</label>
-                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="+1 555-0199" required>
+                    <input type="tel" class="form-control" id="phone" name="phone" required>
                     <div class="invalid-feedback">Phone number required.</div>
                 </div>
             </div>
@@ -91,7 +91,7 @@
                 <label for="password" class="form-label small fw-medium">Password</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" class="form-control border-start-0 ps-0 border-end-0" id="password" name="password" placeholder="••••••••" required minlength="8">
+                    <input type="password" class="form-control border-start-0 ps-0 border-end-0" id="password" name="password" required minlength="8">
                     <button class="btn btn-outline-secondary border-start-0 bg-transparent border-end border-top border-bottom text-muted password-toggle" type="button" data-target="password">
                         <i class="fa-solid fa-eye"></i>
                     </button>
@@ -108,7 +108,7 @@
                 <label for="confirm_password" class="form-label small fw-medium">Confirm Password</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-check-double"></i></span>
-                    <input type="password" class="form-control border-start-0 ps-0 border-end-0" id="confirm_password" name="confirm_password" placeholder="••••••••" required>
+                    <input type="password" class="form-control border-start-0 ps-0 border-end-0" id="confirm_password" name="confirm_password" required>
                     <button class="btn btn-outline-secondary border-start-0 bg-transparent border-end border-top border-bottom text-muted password-toggle" type="button" data-target="confirm_password">
                         <i class="fa-solid fa-eye"></i>
                     </button>
@@ -181,8 +181,8 @@
             }
         }
         
-        password.addEventListener('change', validatePasswords);
-        confirm.addEventListener('keyup', validatePasswords);
+        password.addEventListener('input', validatePasswords);
+        confirm.addEventListener('input', validatePasswords);
         
         // Bootstrap standard validation hook
         const forms = document.querySelectorAll('.needs-validation');

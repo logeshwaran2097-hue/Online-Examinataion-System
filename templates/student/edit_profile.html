@@ -8,7 +8,7 @@
         <div class="card card-premium p-4">
             <h3 class="h5 fw-bold mb-4 text-center"><i class="fa-solid fa-user-pen me-2 text-primary"></i>Update Profile Details</h3>
             
-            <form action="{{ url_for('student.edit_profile') }}" method="POST">
+            <form action="{{ url_for('student.edit_profile') }}" method="POST" class="needs-validation" novalidate>
                 <!-- Name -->
                 <div class="mb-3">
                     <label for="full_name" class="form-label small fw-semibold text-muted">Full Name <font color="red">*</font></label>
@@ -42,6 +42,7 @@
                     <button class="btn btn-link text-reset position-absolute end-0 top-50 translate-middle-y password-toggle mt-3" type="button" data-target="confirm_password" style="z-index: 10;">
                         <i class="fa-solid fa-eye text-muted"></i>
                     </button>
+                    <div class="invalid-feedback" id="confirm-feedback">Please confirm your new password.</div>
                 </div>
 
                 <!-- Actions -->
@@ -53,4 +54,44 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const password = document.getElementById('new_password');
+        const confirm = document.getElementById('confirm_password');
+        const confirmFeedback = document.getElementById('confirm-feedback');
+
+        function validatePasswords() {
+            if (password.value || confirm.value) {
+                if (password.value !== confirm.value) {
+                    confirm.setCustomValidity('Passwords do not match');
+                    confirmFeedback.textContent = 'Passwords do not match.';
+                } else {
+                    confirm.setCustomValidity('');
+                    confirmFeedback.textContent = 'Please confirm your new password.';
+                }
+            } else {
+                confirm.setCustomValidity('');
+            }
+        }
+        
+        password.addEventListener('input', validatePasswords);
+        confirm.addEventListener('input', validatePasswords);
+
+        // Bootstrap standard validation hook
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                validatePasswords();
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
 {% endblock %}

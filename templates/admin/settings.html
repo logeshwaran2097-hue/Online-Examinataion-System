@@ -125,8 +125,8 @@
             }
         }
         
-        password.addEventListener('change', validatePasswords);
-        confirm.addEventListener('keyup', validatePasswords);
+        password.addEventListener('input', validatePasswords);
+        confirm.addEventListener('input', validatePasswords);
 
         // Bootstrap standard validation hook
         const forms = document.querySelectorAll('.needs-validation');
