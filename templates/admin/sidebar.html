@@ -6,40 +6,40 @@
         </a>
     </div>
     <div class="sidebar-nav">
-        <a href="#" class="sidebar-link {% if active_page == 'dashboard' %}active{% endif %}">
+        <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if active_page == 'dashboard' %}active{% endif %}">
             <i class="fa-solid fa-chart-pie"></i> Metrics
         </a>
-        <a href="#" class="sidebar-link {% if active_page == 'students' %}active{% endif %}">
+        <a href="{{ url_for('admin.students') }}" class="sidebar-link {% if active_page == 'students' %}active{% endif %}">
             <i class="fa-solid fa-users-gear"></i> Students
         </a>
-        <a href="#" class="sidebar-link {% if active_page == 'exams' %}active{% endif %}">
+        <a href="{{ url_for('admin.exams') }}" class="sidebar-link {% if active_page == 'exams' %}active{% endif %}">
             <i class="fa-solid fa-file-signature"></i> Exams
         </a>
-        <a href="#" class="sidebar-link {% if active_page == 'questions' %}active{% endif %}">
+        <a href="{{ url_for('admin.questions') }}" class="sidebar-link {% if active_page == 'questions' %}active{% endif %}">
             <i class="fa-solid fa-folder-open"></i> Question Bank
         </a>
-        <a href="#" class="sidebar-link {% if active_page == 'results' %}active{% endif %}">
+        <a href="{{ url_for('admin.results') }}" class="sidebar-link {% if active_page == 'results' %}active{% endif %}">
             <i class="fa-solid fa-graduation-cap"></i> Results
         </a>
-        <a href="#" class="sidebar-link {% if active_page == 'monitoring' %}active{% endif %}">
+        <a href="{{ url_for('admin.monitoring') }}" class="sidebar-link {% if active_page == 'monitoring' %}active{% endif %}">
             <i class="fa-solid fa-desktop"></i> Live Monitor
         </a>
-        <a href="#" class="sidebar-link {% if active_page == 'analytics' %}active{% endif %}">
+        <a href="{{ url_for('admin.analytics') }}" class="sidebar-link {% if active_page == 'analytics' %}active{% endif %}">
             <i class="fa-solid fa-chart-line"></i> Analytics
         </a>
-        <a href="#" class="sidebar-link {% if active_page == 'certificates' %}active{% endif %}">
+        <a href="{{ url_for('admin.certificates') }}" class="sidebar-link {% if active_page == 'certificates' %}active{% endif %}">
             <i class="fa-solid fa-certificate"></i> Certificates
         </a>
-        <a href="#" class="sidebar-link {% if active_page == 'notifications' %}active{% endif %}">
+        <a href="{{ url_for('admin.notifications') }}" class="sidebar-link {% if active_page == 'notifications' %}active{% endif %}">
             <i class="fa-solid fa-bell"></i> Alerts
         </a>
-        <a href="#" class="sidebar-link {% if active_page == 'attendance' %}active{% endif %}">
+        <a href="{{ url_for('admin.attendance') }}" class="sidebar-link {% if active_page == 'attendance' %}active{% endif %}">
             <i class="fa-solid fa-calendar-check"></i> Attendance
         </a>
-        <a href="#" class="sidebar-link {% if active_page == 'activity_logs' %}active{% endif %}">
+        <a href="{{ url_for('admin.activity_logs') }}" class="sidebar-link {% if active_page == 'activity_logs' %}active{% endif %}">
             <i class="fa-solid fa-clock-rotate-left"></i> Security Logs
         </a>
-        <a href="#" class="sidebar-link {% if active_page == 'settings' %}active{% endif %}">
+        <a href="{{ url_for('admin.settings') }}" class="sidebar-link {% if active_page == 'settings' %}active{% endif %}">
             <i class="fa-solid fa-gears"></i> Settings
         </a>
         <hr class="mx-3 my-2 text-white-50">

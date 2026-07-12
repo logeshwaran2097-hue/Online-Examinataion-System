@@ -10,31 +10,31 @@
             <span class="fs-4 fw-bold text-white"><i class="fa-solid fa-graduation-cap me-2 text-primary"></i>EduExam</span>
         </div>
         <div class="sidebar-nav">
-            <a href="#" class="sidebar-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
+            <a href="{{ url_for('student.dashboard') }}" class="sidebar-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
                 <i class="fa-solid fa-chart-line"></i> Dashboard
             </a>
-            <a href="#" class="sidebar-link {% if request.endpoint in ['student.exams', 'student.exam_instructions', 'student.take_exam'] %}active{% endif %}">
+            <a href="{{ url_for('student.exams') }}" class="sidebar-link {% if request.endpoint in ['student.exams', 'student.exam_instructions', 'student.take_exam'] %}active{% endif %}">
                 <i class="fa-solid fa-clipboard-list"></i> Available Exams
             </a>
-            <a href="#" class="sidebar-link {% if request.endpoint in ['student.results', 'student.review_exam'] %}active{% endif %}">
+            <a href="{{ url_for('student.results') }}" class="sidebar-link {% if request.endpoint in ['student.results', 'student.review_exam'] %}active{% endif %}">
                 <i class="fa-solid fa-square-poll-vertical"></i> Exam Results
             </a>
-            <a href="#" class="sidebar-link {% if request.endpoint == 'student.analytics' %}active{% endif %}">
+            <a href="{{ url_for('student.analytics') }}" class="sidebar-link {% if request.endpoint == 'student.analytics' %}active{% endif %}">
                 <i class="fa-solid fa-chart-pie"></i> Performance Analytics
             </a>
-            <a href="#" class="sidebar-link {% if request.endpoint == 'student.leaderboard' %}active{% endif %}">
+            <a href="{{ url_for('student.leaderboard') }}" class="sidebar-link {% if request.endpoint == 'student.leaderboard' %}active{% endif %}">
                 <i class="fa-solid fa-trophy"></i> Leaderboard
             </a>
-            <a href="#" class="sidebar-link {% if request.endpoint == 'student.certificates' %}active{% endif %}">
+            <a href="{{ url_for('student.certificates') }}" class="sidebar-link {% if request.endpoint == 'student.certificates' %}active{% endif %}">
                 <i class="fa-solid fa-award"></i> Certificates
             </a>
-            <a href="#" class="sidebar-link {% if request.endpoint == 'student.notifications' %}active{% endif %}">
+            <a href="{{ url_for('student.notifications') }}" class="sidebar-link {% if request.endpoint == 'student.notifications' %}active{% endif %}">
                 <i class="fa-solid fa-bell"></i> Notifications
             </a>
-            <a href="#" class="sidebar-link {% if request.endpoint == 'student.history' %}active{% endif %}">
+            <a href="{{ url_for('student.history') }}" class="sidebar-link {% if request.endpoint == 'student.history' %}active{% endif %}">
                 <i class="fa-solid fa-clock-rotate-left"></i> Activity History
             </a>
-            <a href="#" class="sidebar-link {% if request.endpoint == 'student.settings' %}active{% endif %}">
+            <a href="{{ url_for('student.settings') }}" class="sidebar-link {% if request.endpoint == 'student.settings' %}active{% endif %}">
                 <i class="fa-solid fa-sliders"></i> Settings
             </a>
             
