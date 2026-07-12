@@ -12,7 +12,7 @@
                 <!-- Name -->
                 <div class="mb-3">
                     <label for="full_name" class="form-label small fw-semibold text-muted">Full Name <font color="red">*</font></label>
-                    <input type="text" class="form-control rounded-3" id="full_name" name="full_name" value="{{ student.full_name }}" required>
+                    <input type="text" class="form-control rounded-3" id="full_name" name="full_name" value="{{ student.full_name }}" placeholder="e.g. John Doe" required>
                 </div>
 
                 <!-- Phone -->
@@ -29,7 +29,7 @@
                 <!-- New Password -->
                 <div class="mb-3 position-relative">
                     <label for="new_password" class="form-label small fw-semibold text-muted">New Password</label>
-                    <input type="password" class="form-control rounded-3 pr-5" id="new_password" name="new_password">
+                    <input type="password" class="form-control rounded-3 pr-5" id="new_password" name="new_password" placeholder="••••••••">
                     <button class="btn btn-link text-reset position-absolute end-0 top-50 translate-middle-y password-toggle mt-3" type="button" data-target="new_password" style="z-index: 10;">
                         <i class="fa-solid fa-eye text-muted"></i>
                     </button>
@@ -38,7 +38,7 @@
                 <!-- Confirm Password -->
                 <div class="mb-4 position-relative">
                     <label for="confirm_password" class="form-label small fw-semibold text-muted">Confirm New Password</label>
-                    <input type="password" class="form-control rounded-3 pr-5" id="confirm_password" name="confirm_password">
+                    <input type="password" class="form-control rounded-3 pr-5" id="confirm_password" name="confirm_password" placeholder="••••••••">
                     <button class="btn btn-link text-reset position-absolute end-0 top-50 translate-middle-y password-toggle mt-3" type="button" data-target="confirm_password" style="z-index: 10;">
                         <i class="fa-solid fa-eye text-muted"></i>
                     </button>

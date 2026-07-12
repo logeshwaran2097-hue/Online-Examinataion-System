@@ -33,14 +33,14 @@
                         <!-- Title -->
                         <div class="col-md-6 mb-3">
                             <label for="exam_title" class="form-label small fw-medium">Exam Title</label>
-                            <input type="text" class="form-control" id="exam_title" name="exam_title" value="{{ exam.exam_title }}" required>
+                            <input type="text" class="form-control" id="exam_title" name="exam_title" value="{{ exam.exam_title }}" placeholder="e.g. Data Structures Midterm" required>
                             <div class="invalid-feedback">Please enter an exam title.</div>
                         </div>
 
                         <!-- Subject -->
                         <div class="col-md-6 mb-3">
                             <label for="subject_name" class="form-label small fw-medium">Subject Name</label>
-                            <input type="text" class="form-control" id="subject_name" name="subject_name" value="{{ exam.subject_name }}" required>
+                            <input type="text" class="form-control" id="subject_name" name="subject_name" value="{{ exam.subject_name }}" placeholder="e.g. Computer Science" required>
                             <div class="invalid-feedback">Please enter the subject name.</div>
                         </div>
                     </div>
@@ -48,21 +48,21 @@
                     <!-- Description -->
                     <div class="mb-3">
                         <label for="description" class="form-label small fw-medium">Description</label>
-                        <textarea class="form-control" id="description" name="description" rows="3">{{ exam.description }}</textarea>
+                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Instructions, topics covered, policies...">{{ exam.description }}</textarea>
                     </div>
 
                     <div class="row">
                         <!-- Duration -->
                         <div class="col-md-4 mb-3">
                             <label for="duration_minutes" class="form-label small fw-medium">Duration (Minutes)</label>
-                            <input type="number" class="form-control" id="duration_minutes" name="duration_minutes" min="1" value="{{ exam.duration_minutes }}" required>
+                            <input type="number" class="form-control" id="duration_minutes" name="duration_minutes" min="1" value="{{ exam.duration_minutes }}" placeholder="e.g. 60" required>
                             <div class="invalid-feedback">Please enter a valid positive duration.</div>
                         </div>
 
                         <!-- Pass Mark -->
                         <div class="col-md-4 mb-3">
                             <label for="pass_mark" class="form-label small fw-medium">Pass Mark</label>
-                            <input type="number" class="form-control" id="pass_mark" name="pass_mark" min="0" value="{{ exam.pass_mark }}" required>
+                            <input type="number" class="form-control" id="pass_mark" name="pass_mark" min="0" value="{{ exam.pass_mark }}" placeholder="e.g. 50" required>
                             <div class="invalid-feedback">Please enter passing threshold marks.</div>
                         </div>
 
@@ -83,21 +83,21 @@
                         <!-- Date -->
                         <div class="col-md-4 mb-3">
                             <label for="exam_date" class="form-label small fw-medium">Exam Date</label>
-                            <input type="date" class="form-control" id="exam_date" name="exam_date" value="{{ exam.exam_date.strftime('%Y-%m-%d') if exam.exam_date else '' }}" required>
+                            <input type="date" class="form-control" id="exam_date" name="exam_date" value="{{ exam.exam_date.strftime('%Y-%m-%d') if exam.exam_date else '' }}" placeholder="YYYY-MM-DD" required>
                             <div class="invalid-feedback">Please select a date.</div>
                         </div>
 
                         <!-- Start Time -->
                         <div class="col-md-4 mb-3">
                             <label for="start_time" class="form-label small fw-medium">Start Time</label>
-                            <input type="time" class="form-control" id="start_time" name="start_time" value="{{ exam.start_time.strftime('%H:%M') if exam.start_time else '' }}" required>
+                            <input type="time" class="form-control" id="start_time" name="start_time" value="{{ exam.start_time.strftime('%H:%M') if exam.start_time else '' }}" placeholder="HH:MM" required>
                             <div class="invalid-feedback">Start time required.</div>
                         </div>
 
                         <!-- End Time -->
                         <div class="col-md-4 mb-4">
                             <label for="end_time" class="form-label small fw-medium">End Time</label>
-                            <input type="time" class="form-control" id="end_time" name="end_time" value="{{ exam.end_time.strftime('%H:%M') if exam.end_time else '' }}" required>
+                            <input type="time" class="form-control" id="end_time" name="end_time" value="{{ exam.end_time.strftime('%H:%M') if exam.end_time else '' }}" placeholder="HH:MM" required>
                             <div class="invalid-feedback">End time required.</div>
                         </div>
                     </div>
