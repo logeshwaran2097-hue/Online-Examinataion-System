@@ -1,7 +1,7 @@
 import random
 from datetime import datetime, date, time, timedelta
 from database import db, bcrypt
-from models import User, Admin, Exam, Attendance, Question, Option, StudentAnswer, Result, Certificate, ExamMonitoring, Notification, ActivityLog
+from models import User, Admin, Exam, Attendance, Question, Option, StudentAnswer, Result, Certificate, ExamMonitoring, Notification, ActivityLog, Leaderboard, Analytics
 
 def seed_demo_data():
     """
@@ -315,6 +315,21 @@ def seed_demo_data():
             browser="Chrome/124.0.0"
         )
         db.session.add_all([log1, log2])
+
+        # 10. Seed Leaderboard
+        l1 = Leaderboard(student_id=students[0].id, total_score=85, rank_position=2)
+        l2 = Leaderboard(student_id=students[1].id, total_score=98, rank_position=1)
+        l3 = Leaderboard(student_id=students[2].id, total_score=75, rank_position=4)
+        l4 = Leaderboard(student_id=students[3].id, total_score=40, rank_position=5)
+        l5 = Leaderboard(student_id=students[4].id, total_score=80, rank_position=3)
+        db.session.add_all([l1, l2, l3, l4, l5])
+
+        # 11. Seed Analytics
+        a1 = Analytics(student_id=students[0].id, subject_name="Computer Science", average_score=82.50, exams_taken=4, performance_level="Excellent")
+        a2 = Analytics(student_id=students[0].id, subject_name="Mathematics", average_score=74.00, exams_taken=2, performance_level="Good")
+        a3 = Analytics(student_id=students[1].id, subject_name="Computer Science", average_score=96.00, exams_taken=5, performance_level="Outstanding")
+        a4 = Analytics(student_id=students[2].id, subject_name="Computer Science", average_score=68.00, exams_taken=3, performance_level="Satisfactory")
+        db.session.add_all([a1, a2, a3, a4])
 
         # Commit everything
         db.session.commit()
