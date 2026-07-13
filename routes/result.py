@@ -225,7 +225,7 @@ def download_pdf_report(result_id):
         "wrong_answers": calc.get("wrong_answers", 0),
         "skipped_questions": calc.get("skipped_questions", 0),
         "duration_minutes": res.exam.duration_minutes,
-        "date_taken": res.created_at.strftime('%Y-%m-%d %H:%M')
+        "date_taken": res.generated_at.strftime('%Y-%m-%d %H:%M')
     }
     
     # Generate QR verification link base64
