@@ -242,9 +242,12 @@ def resend_otp():
         return redirect(url_for('auth.reset_password'))
     return redirect(url_for('auth.otp'))
 
+from utils.seeder import seed_demo_data
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     seed_default_student()
+    seed_demo_data()
     if current_user.is_authenticated:
         return redirect(url_for('dashboard.student_dashboard'))
 

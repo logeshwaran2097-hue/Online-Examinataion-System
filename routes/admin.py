@@ -52,10 +52,13 @@ def seed_default_admin():
         db.session.rollback()
         print(f"Error seeding default admin: {e}")
 
+from utils.seeder import seed_demo_data
+
 @admin_bp.before_request
 def check_admin_auth():
     # Make sure we have at least one admin seeded
     seed_default_admin()
+    seed_demo_data()
     
     # Exempt admin login from RBAC check
     if request.endpoint == 'admin.login':
